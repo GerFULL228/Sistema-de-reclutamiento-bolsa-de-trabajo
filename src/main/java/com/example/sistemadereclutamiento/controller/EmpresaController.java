@@ -1,13 +1,14 @@
 package com.example.sistemadereclutamiento.controller;
 
-import com.example.sistemadereclutamiento.model.Empresa;
+import com.example.sistemadereclutamiento.dto.EmpresaRequestDTO;
+import com.example.sistemadereclutamiento.dto.EmpresaResponseDTO;
 import com.example.sistemadereclutamiento.service.EmpresaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/empresas")
@@ -17,46 +18,29 @@ public class EmpresaController {
     private EmpresaService empresaService;
 
     @GetMapping
-    public List<Empresa> listarEmpresas() {
-        return empresaService.obtenerTodas();
+    public ResponseEntity<List<EmpresaResponseDTO>> listarEmpresas() {
+        return ResponseEntity.ok(empresaService.obtenerTodas());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Empresa> obtenerEmpresa(@PathVariable Long id) {
-        Optional<Empresa> empresa = empresaService.obtenerPorId(id);
-        return empresa.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<EmpresaResponseDTO> obtenerEmpresa(@PathVariable Long id) {
+        return ResponseEntity.ok(empresaService.obtenerPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<Empresa> crearEmpresa(@RequestBody Empresa empresa) {
-        Empresa nuevaEmpresa = empresaService.guardarEmpresa(empresa);
-        return ResponseEntity.ok(nuevaEmpresa);
+    public ResponseEntity<EmpresaResponseDTO> crearEmpresa(@RequestBody EmpresaRequestDTO requestDTO) {
+        EmpresaResponseDTO nuevaEmpresa = empresaService.guardarEmpresa(requestDTO);
+        return new ResponseEntity<>(nuevaEmpresa, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Empresa> actualizarEmpresa(@PathVariable Long id, @RequestBody Empresa detallesEmpresa) {
-        Optional<Empresa> empresaExistente = empresaService.obtenerPorId(id);
-        
-        if (empresaExistente.isPresent()) {
-            Empresa empresaActualizada = empresaExistente.get();
-            empresaActualizada.setRazonSocial(detallesEmpresa.getRazonSocial());
-            empresaActualizada.setRuc(detallesEmpresa.getRuc());
-            return ResponseEntity.ok(empresaService.guardarEmpresa(empresaActualizada));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<EmpresaResponseDTO> actualizarEmpresa(@PathVariable Long id, @RequestBody EmpresaRequestDTO requestDTO) {
+        return ResponseEntity.ok(empresaService.actualizarEmpresa(id, requestDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEmpresa(@PathVariable Long id) {
-        Optional<Empresa> empresaExistente = empresaService.obtenerPorId(id);
-        
-        if (empresaExistente.isPresent()) {
-            empresaService.eliminarEmpresa(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        empresaService.eliminarEmpresa(id);
+        return ResponseEntity.noContent().build();
     }
 }
