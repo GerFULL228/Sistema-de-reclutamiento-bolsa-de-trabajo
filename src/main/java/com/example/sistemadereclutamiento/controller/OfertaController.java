@@ -1,14 +1,15 @@
 package com.example.sistemadereclutamiento.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.dto.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.dto.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.service.OfertaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/ofertas")
@@ -18,9 +19,17 @@ public class OfertaController {
     private OfertaService ofertaService;
 
     @GetMapping
-    public ResponseEntity<List<OfertaResponseDTO>> listarOfertas() {
-        return ResponseEntity.ok(ofertaService.obtenerTodas());
-    }
+public ResponseEntity<Page<OfertaResponseDTO>> listarOfertas(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size
+) {
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    return ResponseEntity.ok(
+            ofertaService.obtenerTodas(pageable)
+    );
+}
 
     @GetMapping("/{id}")
     public ResponseEntity<OfertaResponseDTO> obtenerOferta(@PathVariable Long id) {
