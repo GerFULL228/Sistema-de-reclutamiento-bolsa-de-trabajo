@@ -1,5 +1,8 @@
 package com.example.sistemadereclutamiento.service;
 
+import com.example.sistemadereclutamiento.mapper.OfertaMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.dto.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.dto.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
@@ -10,9 +13,6 @@ import com.example.sistemadereclutamiento.repository.OfertaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class OfertaService {
 
@@ -21,6 +21,9 @@ public class OfertaService {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+
+    @Autowired
+    private OfertaMapper ofertaMapper;
 
     public OfertaResponseDTO guardarOferta(OfertaRequestDTO requestDTO) {
 
@@ -39,15 +42,13 @@ public class OfertaService {
 
         Oferta nuevaOferta = ofertaRepository.save(oferta);
 
-        return mapearADTO(nuevaOferta);
+        return ofertaMapper.toDTO(nuevaOferta);
     }
 
-    public List<OfertaResponseDTO> obtenerTodas() {
-        return ofertaRepository.findAll()
-                .stream()
-                .map(this::mapearADTO)
-                .collect(Collectors.toList());
-    }
+    public Page<OfertaResponseDTO> obtenerTodas(Pageable pageable) {
+    return ofertaRepository.findAll(pageable)
+            .map(ofertaMapper::toDTO);
+}
 
     public OfertaResponseDTO obtenerPorId(Long id) {
 
@@ -56,7 +57,7 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
-        return mapearADTO(oferta);
+        return ofertaMapper.toDTO(oferta);
     }
 
     public OfertaResponseDTO actualizarOferta(Long id, OfertaRequestDTO requestDTO) {
@@ -93,19 +94,7 @@ public class OfertaService {
         ofertaRepository.delete(oferta);
     }
 
-    private OfertaResponseDTO mapearADTO(Oferta oferta) {
-        OfertaResponseDTO dto = new OfertaResponseDTO();
-        dto.setId(oferta.getId());
-        dto.setTitulo(oferta.getTitulo());
-        dto.setDescripcion(oferta.getDescripcion());
-        dto.setUbicacion(oferta.getUbicacion());
-        dto.setSalario(oferta.getSalario());
-        dto.setEstado(oferta.getEstado());
-
-        if (oferta.getEmpresa() != null) {
-            dto.setNombreEmpresa(oferta.getEmpresa().getNombreEmpresa());
+        private OfertaResponseDTO mapearADTO(Oferta oferta) {
+                return ofertaMapper.toDTO(oferta);
         }
-
-        return dto;
-    }
 }
