@@ -51,10 +51,20 @@
         </dependency>
 
         <!-- FLYWAY -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
+        
+
+    <dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+    <version>10.17.0</version>
+</dependency>
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-database-postgresql</artifactId>
+    <version>10.17.0</version>
+</dependency>
+
+
 
         <!-- LOMBOK -->
         <dependency>
