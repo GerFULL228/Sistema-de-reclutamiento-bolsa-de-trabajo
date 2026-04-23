@@ -1,6 +1,8 @@
 package com.example.sistemadereclutamiento.controller;
 
-import com.example.sistemadereclutamiento.service.OfertaService;
+import com.example.sistemadereclutamiento.oferta.controller.OfertaController;
+
+import com.example.sistemadereclutamiento.oferta.service.OfertaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
