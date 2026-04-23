@@ -1,13 +1,25 @@
 package com.example.sistemadereclutamiento.oferta.mapper;
 
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
+import com.example.sistemadereclutamiento.empresa.entity.Empresa;
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface OfertaMapper {
 
     @Mapping(source = "empresa.nombreEmpresa", target = "nombreEmpresa")
     OfertaResponseDTO toDTO(Oferta oferta);
+
+    @Mapping(source = "empresaId", target = "empresa.id")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "estado", ignore = true)
+    @Mapping(target = "empresa", source = "empresaId")
+    Oferta toEntity(OfertaRequestDTO request);
+
+    void updateEntityFromDto(OfertaRequestDTO dto, @MappingTarget Oferta oferta);
 }

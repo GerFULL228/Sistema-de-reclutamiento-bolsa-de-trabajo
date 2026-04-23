@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.service;
 
+import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +33,9 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
 
-        Oferta oferta = new Oferta();
-        oferta.setTitulo(requestDTO.getTitulo());
-        oferta.setDescripcion(requestDTO.getDescripcion());
-        oferta.setUbicacion(requestDTO.getUbicacion());
-        oferta.setSalario(requestDTO.getSalario());
-        oferta.setEstado(requestDTO.getEstado() != null ? requestDTO.getEstado() : "ACTIVA");
-        oferta.setEmpresa(empresa);
+        Oferta oferta = ofertaMapper.toEntity(requestDTO);
+
+        oferta.setEstado(OfertaEstado.DISPONIBLE);
 
         Oferta nuevaOferta = ofertaRepository.save(oferta);
 
@@ -67,21 +64,13 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
-        Empresa empresa = empresaRepository.findById(requestDTO.getEmpresaId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
 
-        oferta.setTitulo(requestDTO.getTitulo());
-        oferta.setDescripcion(requestDTO.getDescripcion());
-        oferta.setUbicacion(requestDTO.getUbicacion());
-        oferta.setSalario(requestDTO.getSalario());
-        oferta.setEstado(requestDTO.getEstado() != null ? requestDTO.getEstado() : "ACTIVA");
-        oferta.setEmpresa(empresa);
 
-        Oferta actualizada = ofertaRepository.save(oferta);
+        ofertaMapper.updateEntityFromDto(requestDTO, oferta);
 
-        return mapearADTO(actualizada);
+
+
+        return ofertaMapper.toDTO(ofertaRepository.save(oferta));
     }
 
     public void eliminarOferta(Long id) {
@@ -94,7 +83,5 @@ public class OfertaService {
         ofertaRepository.delete(oferta);
     }
 
-        private OfertaResponseDTO mapearADTO(Oferta oferta) {
-                return ofertaMapper.toDTO(oferta);
-        }
+
 }

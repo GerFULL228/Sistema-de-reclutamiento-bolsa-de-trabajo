@@ -28,7 +28,8 @@ public class Oferta {
     private Double salario;
 
     @Column(length = 30, nullable = false)
-    private String estado = "ACTIVA";
+    @Enumerated(EnumType.STRING)
+    private OfertaEstado estado = OfertaEstado.ACTIVA;
 
     @ManyToOne
     @JoinColumn(name="empresa_id", nullable = false)
