@@ -1,8 +1,8 @@
-package com.example.sistemadereclutamiento.controller;
+package com.example.sistemadereclutamiento.empresa.controller;
 
-import com.example.sistemadereclutamiento.dto.EmpresaRequestDTO;
-import com.example.sistemadereclutamiento.dto.EmpresaResponseDTO;
-import com.example.sistemadereclutamiento.service.EmpresaService;
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
+import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
+import com.example.sistemadereclutamiento.empresa.service.EmpresaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

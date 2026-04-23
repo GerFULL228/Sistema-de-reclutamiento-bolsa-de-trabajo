@@ -1,5 +1,6 @@
-package com.example.sistemadereclutamiento.model;
+package com.example.sistemadereclutamiento.oferta.entity;
 
+import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,10 +18,10 @@ public class Oferta {
     @Column(nullable = false, length = 150)
     private String titulo;
 
-    @Column(columnDefinition = "text")
+
     private String descripcion;
 
-    @Column(length = 120)
+
     private String ubicacion;
 
     @Column(nullable = false)

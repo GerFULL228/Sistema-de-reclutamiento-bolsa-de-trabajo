@@ -1,10 +1,14 @@
-package com.example.sistemadereclutamiento.model;
+package com.example.sistemadereclutamiento.usuario.entity;
 
+import com.example.sistemadereclutamiento.rol.entity.Rol;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "usuarios")
@@ -17,24 +21,24 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100)
+
     private String nombre;
 
-    @Column(length = 100)
     private String apellido;
 
-    @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(columnDefinition = "boolean default true")
     private Boolean estado = true;
 
     @Column(name = "fecha_creacion", insertable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(nullable = false)
-    private String rol; 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "usuario_rol",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "rol_id")
+    )
+    private Set<Rol> roles = new HashSet<>();
 }

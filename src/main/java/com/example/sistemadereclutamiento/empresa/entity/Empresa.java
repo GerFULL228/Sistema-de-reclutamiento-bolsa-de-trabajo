@@ -1,5 +1,5 @@
-package com.example.sistemadereclutamiento.model;
-
+package com.example.sistemadereclutamiento.empresa.entity;
+import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,15 +19,10 @@ public class Empresa {
     @Column(name = "nombre_empresa", length = 150)
     private String nombreEmpresa;
 
-    @Column(name = "razon_social", nullable = false)
-    private String razonSocial;
-
     private String ruc;
 
-    @Column(columnDefinition = "text")
     private String descripcion;
 
-    @Column(length = 200)
     private String direccion;
 
     @Column(name = "pagina_web", length = 150)
@@ -37,7 +32,7 @@ public class Empresa {
     private String estadoValidacion = "PENDIENTE";
 
    
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 }

@@ -1,14 +1,15 @@
-package com.example.sistemadereclutamiento.dto;
+package com.example.sistemadereclutamiento.oferta.dto.response;
 
 import lombok.Data;
 
 @Data
-public class OfertaRequestDTO {
+public class OfertaResponseDTO {
 
+    private Long id;
     private String titulo;
     private String descripcion;
     private String ubicacion;
     private Double salario;
     private String estado;
-    private Long empresaId;
+    private String nombreEmpresa;
 }

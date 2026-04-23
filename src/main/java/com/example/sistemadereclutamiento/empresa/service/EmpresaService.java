@@ -1,11 +1,11 @@
-package com.example.sistemadereclutamiento.service;
+package com.example.sistemadereclutamiento.empresa.service;
 
-import com.example.sistemadereclutamiento.dto.EmpresaRequestDTO;
-import com.example.sistemadereclutamiento.dto.EmpresaResponseDTO;
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
+import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
 import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
-import com.example.sistemadereclutamiento.model.Empresa;
-import com.example.sistemadereclutamiento.model.Usuario;
-import com.example.sistemadereclutamiento.repository.EmpresaRepository;
+import com.example.sistemadereclutamiento.empresa.entity.Empresa;
+import com.example.sistemadereclutamiento.usuario.entity.Usuario;
+import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class EmpresaService {
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró la empresa con el ID: " + id));
 
         empresaExistente.setNombreEmpresa(requestDTO.getNombreEmpresa());
-        empresaExistente.setRazonSocial(requestDTO.getRazonSocial());
+
         empresaExistente.setRuc(requestDTO.getRuc());
         empresaExistente.setDescripcion(requestDTO.getDescripcion());
         empresaExistente.setDireccion(requestDTO.getDireccion());
@@ -62,7 +62,7 @@ public class EmpresaService {
     private Empresa mapearAEntidad(EmpresaRequestDTO dto) {
         Empresa empresa = new Empresa();
         empresa.setNombreEmpresa(dto.getNombreEmpresa());
-        empresa.setRazonSocial(dto.getRazonSocial());
+
         empresa.setRuc(dto.getRuc());
         empresa.setDescripcion(dto.getDescripcion());
         empresa.setDireccion(dto.getDireccion());
@@ -86,7 +86,7 @@ public class EmpresaService {
         EmpresaResponseDTO dto = new EmpresaResponseDTO();
         dto.setId(empresa.getId());
         dto.setNombreEmpresa(empresa.getNombreEmpresa());
-        dto.setRazonSocial(empresa.getRazonSocial());
+
         dto.setRuc(empresa.getRuc());
         dto.setEstadoValidacion(empresa.getEstadoValidacion());
         

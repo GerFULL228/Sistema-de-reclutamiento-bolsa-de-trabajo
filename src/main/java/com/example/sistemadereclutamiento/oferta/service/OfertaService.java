@@ -1,15 +1,15 @@
-package com.example.sistemadereclutamiento.service;
+package com.example.sistemadereclutamiento.oferta.service;
 
-import com.example.sistemadereclutamiento.mapper.OfertaMapper;
+import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.sistemadereclutamiento.dto.OfertaRequestDTO;
-import com.example.sistemadereclutamiento.dto.OfertaResponseDTO;
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
+import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
-import com.example.sistemadereclutamiento.model.Empresa;
-import com.example.sistemadereclutamiento.model.Oferta;
-import com.example.sistemadereclutamiento.repository.EmpresaRepository;
-import com.example.sistemadereclutamiento.repository.OfertaRepository;
+import com.example.sistemadereclutamiento.empresa.entity.Empresa;
+import com.example.sistemadereclutamiento.oferta.entity.Oferta;
+import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
+import com.example.sistemadereclutamiento.oferta.repository.OfertaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

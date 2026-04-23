@@ -1,10 +1,10 @@
-package com.example.sistemadereclutamiento.controller;
+package com.example.sistemadereclutamiento.oferta.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.sistemadereclutamiento.dto.OfertaRequestDTO;
-import com.example.sistemadereclutamiento.dto.OfertaResponseDTO;
-import com.example.sistemadereclutamiento.service.OfertaService;
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
+import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
+import com.example.sistemadereclutamiento.oferta.service.OfertaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;

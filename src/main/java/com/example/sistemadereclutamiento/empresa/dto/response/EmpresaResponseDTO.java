@@ -1,4 +1,4 @@
-package com.example.sistemadereclutamiento.dto;
+package com.example.sistemadereclutamiento.empresa.dto.response;
 
 import lombok.Data;
 
