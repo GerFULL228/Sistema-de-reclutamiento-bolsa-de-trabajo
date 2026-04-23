@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
-import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
+import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
 import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;

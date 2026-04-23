@@ -1,5 +1,6 @@
-package com.example.sistemadereclutamiento.exception;
+package com.example.sistemadereclutamiento.shared;
 
+import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

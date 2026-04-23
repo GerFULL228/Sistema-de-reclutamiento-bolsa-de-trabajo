@@ -2,7 +2,7 @@ package com.example.sistemadereclutamiento.empresa.service;
 
 import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
 import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
-import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
+import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
@@ -75,7 +75,7 @@ public class EmpresaService {
             usuario.setApellido(dto.getUsuario().getApellido());
             usuario.setEmail(dto.getUsuario().getEmail());
             usuario.setPassword(dto.getUsuario().getPassword());
-            usuario.setRol(dto.getUsuario().getRol());
+
             usuario.setEstado(true); // Activo por defecto
             empresa.setUsuario(usuario);
         }
