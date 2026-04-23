@@ -27,9 +27,12 @@ public class Empresa {
 
     @Column(name = "pagina_web", length = 150)
     private String paginaWeb;
+    @Column(name = "razon_social")
+    private String razonSocial;
 
     @Column(name = "estado_validacion", length = 30)
-    private String estadoValidacion = "PENDIENTE";
+    @Enumerated(EnumType.STRING)
+    private EstadoValidacion estadoValidacion = EstadoValidacion.PENDIENTE;
 
    
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

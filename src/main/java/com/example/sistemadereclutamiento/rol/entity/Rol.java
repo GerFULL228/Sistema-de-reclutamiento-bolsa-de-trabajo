@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Data
-
+@Table(name = "roles")
 @NoArgsConstructor
 public class Rol {
     @Id
@@ -22,7 +22,7 @@ public class Rol {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "rol_permiso",
+            name = "rol_permisos",
             joinColumns = @JoinColumn(name = "rol_id"),
             inverseJoinColumns = @JoinColumn(name = "permiso_id")
 

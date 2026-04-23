@@ -50,6 +50,7 @@ CREATE TABLE empresas (
                           descripcion TEXT,
                           direccion VARCHAR(200),
                           pagina_web VARCHAR(150),
+                          razon_social VARCHAR(130),
                           estado_validacion VARCHAR(30) DEFAULT 'PENDIENTE',
                           CONSTRAINT fk_empresa_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );

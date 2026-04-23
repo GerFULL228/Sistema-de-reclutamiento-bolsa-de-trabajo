@@ -11,10 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "usuarios")
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
@@ -36,7 +37,7 @@ public class Usuario {
     private LocalDateTime fechaCreacion;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "usuario_rol",
+    @JoinTable(name = "usuario_roles",
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )

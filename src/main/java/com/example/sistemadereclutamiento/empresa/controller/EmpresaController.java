@@ -3,6 +3,7 @@ package com.example.sistemadereclutamiento.empresa.controller;
 import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
 import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
 import com.example.sistemadereclutamiento.empresa.service.EmpresaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +29,13 @@ public class EmpresaController {
     }
 
     @PostMapping
-    public ResponseEntity<EmpresaResponseDTO> crearEmpresa(@RequestBody EmpresaRequestDTO requestDTO) {
+    public ResponseEntity<EmpresaResponseDTO> crearEmpresa( @RequestBody @Valid EmpresaRequestDTO requestDTO) {
         EmpresaResponseDTO nuevaEmpresa = empresaService.guardarEmpresa(requestDTO);
         return new ResponseEntity<>(nuevaEmpresa, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> actualizarEmpresa(@PathVariable Long id, @RequestBody EmpresaRequestDTO requestDTO) {
+    public ResponseEntity<EmpresaResponseDTO> actualizarEmpresa(  @PathVariable Long id, @RequestBody  @Valid EmpresaRequestDTO requestDTO) {
         return ResponseEntity.ok(empresaService.actualizarEmpresa(id, requestDTO));
     }
 

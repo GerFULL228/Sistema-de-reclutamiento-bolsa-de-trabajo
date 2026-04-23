@@ -2,54 +2,62 @@ package com.example.sistemadereclutamiento.empresa.service;
 
 import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
 import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
+import com.example.sistemadereclutamiento.empresa.entity.EstadoValidacion;
+import com.example.sistemadereclutamiento.empresa.mapper.EmpresaMapper;
+import com.example.sistemadereclutamiento.rol.entity.Rol;
+import com.example.sistemadereclutamiento.rol.repository.RolRepository;
 import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
+import com.example.sistemadereclutamiento.usuario.mapper.UsuarioMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class EmpresaService {
 
-    @Autowired
-    private EmpresaRepository empresaRepository;
+    private final EmpresaMapper empresaMapper;
+    private final UsuarioMapper usuarioMapper;
+    private final EmpresaRepository empresaRepository;
+    private final RolRepository rolRepository;
+
+
 
     public EmpresaResponseDTO guardarEmpresa(EmpresaRequestDTO requestDTO) {
-        Empresa empresa = mapearAEntidad(requestDTO);
-        Empresa nuevaEmpresa = empresaRepository.save(empresa);
-        return mapearADto(nuevaEmpresa);
+        Empresa empresa = empresaMapper.toEntity(requestDTO);
+        Usuario usuario = usuarioMapper.toEntity(requestDTO.getUsuario());
+        Rol rol = rolRepository.findByNombre(requestDTO.getUsuario().getRol()).orElseThrow(()-> new ResourceNotFoundException("rol no encontrado"));
+        usuario.setRoles(Set.of(rol));
+        empresa.setUsuario(usuario);
+        empresa.setEstadoValidacion(EstadoValidacion.PENDIENTE);
+
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
     }
 
     public List<EmpresaResponseDTO> obtenerTodas() {
-        return empresaRepository.findAll()
-                .stream()
-                .map(this::mapearADto)
-                .collect(Collectors.toList());
+        return empresaRepository.listarEmpresas();
     }
 
     public EmpresaResponseDTO obtenerPorId(Long id) {
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró la empresa con el ID: " + id));
-        return mapearADto(empresa);
+        return empresaMapper.toDTO(empresa);
     }
 
     public EmpresaResponseDTO actualizarEmpresa(Long id, EmpresaRequestDTO requestDTO) {
         Empresa empresaExistente = empresaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró la empresa con el ID: " + id));
 
-        empresaExistente.setNombreEmpresa(requestDTO.getNombreEmpresa());
+        empresaMapper.updateEntityFromDto(requestDTO, empresaExistente);
 
-        empresaExistente.setRuc(requestDTO.getRuc());
-        empresaExistente.setDescripcion(requestDTO.getDescripcion());
-        empresaExistente.setDireccion(requestDTO.getDireccion());
-        empresaExistente.setPaginaWeb(requestDTO.getPaginaWeb());
-
-        Empresa empresaActualizada = empresaRepository.save(empresaExistente);
-        return mapearADto(empresaActualizada);
+        return empresaMapper.toDTO(empresaRepository.save(empresaExistente));
     }
 
     public void eliminarEmpresa(Long id) {
@@ -59,40 +67,5 @@ public class EmpresaService {
     }
 
     
-    private Empresa mapearAEntidad(EmpresaRequestDTO dto) {
-        Empresa empresa = new Empresa();
-        empresa.setNombreEmpresa(dto.getNombreEmpresa());
 
-        empresa.setRuc(dto.getRuc());
-        empresa.setDescripcion(dto.getDescripcion());
-        empresa.setDireccion(dto.getDireccion());
-        empresa.setPaginaWeb(dto.getPaginaWeb());
-        empresa.setEstadoValidacion("PENDIENTE"); 
-
-        if (dto.getUsuario() != null) {
-            Usuario usuario = new Usuario();
-            usuario.setNombre(dto.getUsuario().getNombre());
-            usuario.setApellido(dto.getUsuario().getApellido());
-            usuario.setEmail(dto.getUsuario().getEmail());
-            usuario.setPassword(dto.getUsuario().getPassword());
-
-            usuario.setEstado(true); // Activo por defecto
-            empresa.setUsuario(usuario);
-        }
-        return empresa;
-    }
-
-    private EmpresaResponseDTO mapearADto(Empresa empresa) {
-        EmpresaResponseDTO dto = new EmpresaResponseDTO();
-        dto.setId(empresa.getId());
-        dto.setNombreEmpresa(empresa.getNombreEmpresa());
-
-        dto.setRuc(empresa.getRuc());
-        dto.setEstadoValidacion(empresa.getEstadoValidacion());
-        
-        if (empresa.getUsuario() != null) {
-            dto.setUsuarioEmail(empresa.getUsuario().getEmail());
-        }
-        return dto;
-    }
 }
