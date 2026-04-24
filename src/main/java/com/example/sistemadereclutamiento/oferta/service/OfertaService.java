@@ -1,6 +1,8 @@
 package com.example.sistemadereclutamiento.oferta.service;
 
+import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
+import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
@@ -32,13 +34,10 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
 
-        Oferta oferta = new Oferta();
-        oferta.setTitulo(requestDTO.getTitulo());
-        oferta.setDescripcion(requestDTO.getDescripcion());
-        oferta.setUbicacion(requestDTO.getUbicacion());
-        oferta.setSalario(requestDTO.getSalario());
-        oferta.setEstado(requestDTO.getEstado() != null ? requestDTO.getEstado() : "ACTIVA");
+        Oferta oferta = ofertaMapper.toEntity(requestDTO);
         oferta.setEmpresa(empresa);
+
+        oferta.setEstado(OfertaEstado.ACTIVA);
 
         Oferta nuevaOferta = ofertaRepository.save(oferta);
 
@@ -46,8 +45,7 @@ public class OfertaService {
     }
 
     public Page<OfertaResponseDTO> obtenerTodas(Pageable pageable) {
-    return ofertaRepository.findAll(pageable)
-            .map(ofertaMapper::toDTO);
+    return ofertaRepository.listarOfertas(pageable);
 }
 
     public OfertaResponseDTO obtenerPorId(Long id) {
@@ -67,21 +65,16 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
-        Empresa empresa = empresaRepository.findById(requestDTO.getEmpresaId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
 
-        oferta.setTitulo(requestDTO.getTitulo());
-        oferta.setDescripcion(requestDTO.getDescripcion());
-        oferta.setUbicacion(requestDTO.getUbicacion());
-        oferta.setSalario(requestDTO.getSalario());
-        oferta.setEstado(requestDTO.getEstado() != null ? requestDTO.getEstado() : "ACTIVA");
-        oferta.setEmpresa(empresa);
+        if (oferta.getEstado() == OfertaEstado.CERRADA || oferta.getEstado() == OfertaEstado.ELIMINADA) {
+            throw new BusinessException("esta oferta ya no se puede modificar");
+        }
 
-        Oferta actualizada = ofertaRepository.save(oferta);
+        ofertaMapper.updateEntityFromDto(requestDTO, oferta);
 
-        return mapearADTO(actualizada);
+
+
+        return ofertaMapper.toDTO(ofertaRepository.save(oferta));
     }
 
     public void eliminarOferta(Long id) {
@@ -94,7 +87,5 @@ public class OfertaService {
         ofertaRepository.delete(oferta);
     }
 
-        private OfertaResponseDTO mapearADTO(Oferta oferta) {
-                return ofertaMapper.toDTO(oferta);
-        }
+
 }
