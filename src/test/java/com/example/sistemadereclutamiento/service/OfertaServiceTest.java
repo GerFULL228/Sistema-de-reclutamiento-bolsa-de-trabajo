@@ -38,7 +38,7 @@ class OfertaServiceTest {
     void testGuardarOferta() {
 
         OfertaRequestDTO request = new OfertaRequestDTO();
-        request.titulo("Backend");
+        request.setTitulo("Backend");
         request.setDescripcion("Java");
         request.setUbicacion("Lima");
         request.setSalario(3000.0);

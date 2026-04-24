@@ -46,7 +46,7 @@ public ResponseEntity<Page<OfertaResponseDTO>> listarOfertas(
         return new ResponseEntity<>(nuevaOferta, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<OfertaResponseDTO> actualizarOferta(
             @PathVariable Long id,
             @RequestBody OfertaRequestDTO requestDTO) {

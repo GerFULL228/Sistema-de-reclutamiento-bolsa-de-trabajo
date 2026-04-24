@@ -4,6 +4,7 @@ package com.example.sistemadereclutamiento.repository;
 import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
+import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.repository.OfertaRepository;
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import com.example.sistemadereclutamiento.usuario.repository.UsuarioRepositorio;
@@ -52,7 +53,7 @@ class OfertaRepositoryTest {
         oferta.setDescripcion("Trabajo remoto");
         oferta.setUbicacion("Lima");
         oferta.setSalario(2500.0);
-        oferta.setEstado("ACTIVA");
+        oferta.setEstado(OfertaEstado.ACTIVA);
         oferta.setEmpresa(empresa);
 
         Oferta guardada = ofertaRepository.save(oferta);

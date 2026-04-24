@@ -2,6 +2,7 @@ package com.example.sistemadereclutamiento.oferta.service;
 
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
+import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
@@ -34,8 +35,9 @@ public class OfertaService {
                                 "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
 
         Oferta oferta = ofertaMapper.toEntity(requestDTO);
+        oferta.setEmpresa(empresa);
 
-        oferta.setEstado(OfertaEstado.DISPONIBLE);
+        oferta.setEstado(OfertaEstado.ACTIVA);
 
         Oferta nuevaOferta = ofertaRepository.save(oferta);
 
@@ -43,8 +45,7 @@ public class OfertaService {
     }
 
     public Page<OfertaResponseDTO> obtenerTodas(Pageable pageable) {
-    return ofertaRepository.findAll(pageable)
-            .map(ofertaMapper::toDTO);
+    return ofertaRepository.listarOfertas(pageable);
 }
 
     public OfertaResponseDTO obtenerPorId(Long id) {
@@ -65,6 +66,9 @@ public class OfertaService {
                                 "No se encontró la oferta con ID: " + id));
 
 
+        if (oferta.getEstado() == OfertaEstado.CERRADA || oferta.getEstado() == OfertaEstado.ELIMINADA) {
+            throw new BusinessException("esta oferta ya no se puede modificar");
+        }
 
         ofertaMapper.updateEntityFromDto(requestDTO, oferta);
 
