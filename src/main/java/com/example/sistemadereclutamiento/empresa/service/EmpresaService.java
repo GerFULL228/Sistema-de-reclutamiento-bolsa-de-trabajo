@@ -39,7 +39,7 @@ public class EmpresaService {
             throw new BusinessException("el email ya existe " + empresa.getUsuario().getEmail());
         };
         Usuario usuario = usuarioMapper.toEntity(requestDTO.getUsuario());
-        Rol rol = rolRepository.findByNombre(requestDTO.getUsuario().getRol()).orElseThrow(()-> new ResourceNotFoundException("rol no encontrado"));
+        Rol rol = rolRepository.findByNombre("EMPRESA").orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
         usuario.setRoles(Set.of(rol));
         empresa.setUsuario(usuario);
         empresa.setEstadoValidacion(EstadoValidacion.PENDIENTE);
