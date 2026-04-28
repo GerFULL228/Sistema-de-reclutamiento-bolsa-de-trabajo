@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.service;
 
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
 import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
@@ -58,7 +59,7 @@ public class OfertaService {
         return ofertaMapper.toDTO(oferta);
     }
 
-    public OfertaResponseDTO actualizarOferta(Long id, OfertaRequestDTO requestDTO) {
+    public OfertaResponseDTO actualizarOferta(Long id, OfertaUpdateDTO requestDTO) {
 
         Oferta oferta = ofertaRepository.findById(id)
                 .orElseThrow(() ->

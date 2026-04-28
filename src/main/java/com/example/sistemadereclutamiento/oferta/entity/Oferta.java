@@ -8,7 +8,7 @@ import lombok.*;
 @Table(name="ofertas")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+
 public class Oferta {
 
     @Id

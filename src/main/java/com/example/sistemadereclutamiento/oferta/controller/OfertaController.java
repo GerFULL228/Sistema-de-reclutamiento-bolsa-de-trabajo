@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.controller;
 
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
@@ -49,7 +50,7 @@ public ResponseEntity<Page<OfertaResponseDTO>> listarOfertas(
     @PatchMapping("/{id}")
     public ResponseEntity<OfertaResponseDTO> actualizarOferta(
             @PathVariable Long id,
-            @RequestBody OfertaRequestDTO requestDTO) {
+            @RequestBody OfertaUpdateDTO requestDTO) {
 
         return ResponseEntity.ok(
                 ofertaService.actualizarOferta(id, requestDTO));

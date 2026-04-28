@@ -36,7 +36,7 @@ class OfertaRepositoryTest {
         Empresa empresa = new Empresa();
         empresa.setNombreEmpresa("Empresa Test");
 
-// si existe relación obligatoria
+
         Usuario usuario = new Usuario();
         usuario.setNombre("Test");
         usuario.setApellido("Test");
