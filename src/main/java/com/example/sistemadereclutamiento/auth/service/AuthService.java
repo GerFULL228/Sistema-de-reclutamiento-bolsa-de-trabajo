@@ -43,7 +43,7 @@ public class AuthService {
     public TokenResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(),
+                        request.email(),
                         request.password()
                 )
         );
@@ -53,7 +53,7 @@ public class AuthService {
 
         String token = jwtService.generateToken(custom);
 
-        String username = jwtService.extractClaim(token, Claims::getSubject);
+        String email = jwtService.extractClaim(token, Claims::getSubject);
         long expiredIn = props.getExpiration() / 1000;
 
         List<String> roles = jwtService.extractClaim(token,
@@ -68,7 +68,7 @@ public class AuthService {
 
         RefreshToken refreshToken = refreshTokenService.crearRefreshToken(usuario);
 
-        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn, username, rol, permisos);
+        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn, email, rol, permisos);
     }
     @Transactional
     public TokenResponse refresh(String token) {
@@ -122,7 +122,7 @@ public class AuthService {
                 .refreshToken(newRefreshToken.getToken())
                 .tokenType("bearer")
                 .expiresIn(props.getExpiration() / 1000)
-                .username(usuario.getEmail())
+                .email(usuario.getEmail())
                 .rol(rol)
                 .build();
     }

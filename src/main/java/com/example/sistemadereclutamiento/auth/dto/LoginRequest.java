@@ -1,6 +1,6 @@
 package com.example.sistemadereclutamiento.auth.dto;
 
 public record LoginRequest(
-        String username,
+        String email,
         String password
 ) {}
