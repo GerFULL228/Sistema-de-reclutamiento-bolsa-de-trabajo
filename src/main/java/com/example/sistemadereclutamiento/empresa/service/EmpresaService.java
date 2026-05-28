@@ -15,6 +15,7 @@ import com.example.sistemadereclutamiento.usuario.mapper.UsuarioMapper;
 import com.example.sistemadereclutamiento.usuario.repository.UsuarioRepositorio;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,17 +31,17 @@ public class EmpresaService {
     private final EmpresaRepository empresaRepository;
     private final RolRepository rolRepository;
     private final UsuarioRepositorio usuarioRepositorio;
+    private final PasswordEncoder passwordEncoder;
 
 
 
     public EmpresaResponseDTO guardarEmpresa(EmpresaRequestDTO requestDTO) {
         Empresa empresa = empresaMapper.toEntity(requestDTO);
-        if (usuarioRepositorio.existsByEmail(requestDTO.getUsuario().getEmail())) {
-            throw new BusinessException("el email ya existe " + empresa.getUsuario().getEmail());
-        };
-        Usuario usuario = usuarioMapper.toEntity(requestDTO.getUsuario());
+        Usuario usuario = usuarioRepositorio.existsByEmail(requestDTO.getUsuario().getEmail()).orElseThrow(()-> new BusinessException("ya existe un usuario con ese email"));
+         usuarioMapper.toEntity(requestDTO.getUsuario());
         Rol rol = rolRepository.findByNombre("EMPRESA").orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
         usuario.setRoles(Set.of(rol));
+        usuario.setPassword(passwordEncoder.encode(requestDTO.getUsuario().getPassword()));
         empresa.setUsuario(usuario);
         empresa.setEstadoValidacion(EstadoValidacion.PENDIENTE);
 

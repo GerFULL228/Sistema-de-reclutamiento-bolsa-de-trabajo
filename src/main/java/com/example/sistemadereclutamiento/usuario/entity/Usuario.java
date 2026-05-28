@@ -31,7 +31,7 @@ public class Usuario {
 
     private String password;
 
-    private Boolean estado = true;
+    private boolean activo = true;
 
     @Column(name = "fecha_creacion", insertable = false, updatable = false)
     private LocalDateTime fechaCreacion;

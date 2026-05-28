@@ -1,10 +1,11 @@
-package com.example.sistemadereclutamiento.dto;
+package com.example.sistemadereclutamiento.curriculum.dto;
 
 import lombok.Data;
 
 @Data
-public class CurriculumVitaeRequestDTO {
+public class CurriculumVitaeResponseDTO {
 
+    private Long id;
     private String tituloProfesional;
     private String descripcion;
     private String experiencia;
@@ -12,5 +13,5 @@ public class CurriculumVitaeRequestDTO {
     private String educacion;
     private String telefono;
     private String linkedin;
-    private Long usuarioId;
+    private String nombreUsuario;
 }

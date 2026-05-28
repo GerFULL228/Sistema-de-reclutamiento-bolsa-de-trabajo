@@ -1,8 +1,8 @@
-package com.example.sistemadereclutamiento.controller;
+package com.example.sistemadereclutamiento.curriculum.controller;
 
-import com.example.sistemadereclutamiento.dto.CurriculumVitaeRequestDTO;
-import com.example.sistemadereclutamiento.dto.CurriculumVitaeResponseDTO;
-import com.example.sistemadereclutamiento.service.CurriculumVitaeService;
+import com.example.sistemadereclutamiento.curriculum.dto.CurriculumVitaeRequestDTO;
+import com.example.sistemadereclutamiento.curriculum.dto.CurriculumVitaeResponseDTO;
+import com.example.sistemadereclutamiento.curriculum.service.CurriculumVitaeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
