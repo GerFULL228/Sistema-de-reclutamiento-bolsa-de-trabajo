@@ -14,7 +14,7 @@ public class TokenResponse {
     private String refreshToken;
     private String tokenType = "Bearer";
     private long expiresIn;
-    private String username;
+    private String email;
 
     private String rol;
     private List<String> permisos;

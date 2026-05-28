@@ -54,10 +54,12 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**",
+                                "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/api/empresas**",
+                                "/api/ofertas**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,

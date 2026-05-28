@@ -37,7 +37,11 @@ public class EmpresaService {
 
     public EmpresaResponseDTO guardarEmpresa(EmpresaRequestDTO requestDTO) {
         Empresa empresa = empresaMapper.toEntity(requestDTO);
-        Usuario usuario = usuarioRepositorio.existsByEmail(requestDTO.getUsuario().getEmail()).orElseThrow(()-> new BusinessException("ya existe un usuario con ese email"));
+        if (usuarioRepositorio.findByEmail(requestDTO.getUsuario().getEmail()).isPresent()) {
+            throw new BusinessException("Ya existe un usuario con ese email");
+        }
+
+        Usuario usuario = usuarioMapper.toEntity(requestDTO.getUsuario());
          usuarioMapper.toEntity(requestDTO.getUsuario());
         Rol rol = rolRepository.findByNombre("EMPRESA").orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
         usuario.setRoles(Set.of(rol));

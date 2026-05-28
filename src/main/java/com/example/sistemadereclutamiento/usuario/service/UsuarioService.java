@@ -22,7 +22,7 @@ public class UsuarioService {
 
     private Usuario crearUsuarioBase(UsuarioRequestDTO usuarioRequestDTO, String nombreRol) {
         Rol rol = rolRepository.findByNombre(nombreRol).orElseThrow(()-> new ResourceNotFoundException("rol no encontrado"));
-        Usuario usuario = usuarioRepositorio.existsByEmail(usuarioRequestDTO.getEmail()).orElseThrow(()-> new BusinessException("ya existe un usuario con ese email"));
+        Usuario usuario = usuarioRepositorio.findByEmail(usuarioRequestDTO.getEmail()).orElseThrow(()-> new BusinessException("ya existe un usuario con ese email"));
         usuarioMapper.toEntity(usuarioRequestDTO);
         usuario.setPassword(passwordEncoder.encode(usuarioRequestDTO.getPassword()));
         usuario.getRoles().add(rol);

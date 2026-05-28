@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         usuario.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority("ROL_" + role.getNombre()));
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getNombre()));
             role.getPermisos().forEach(permiso -> {
                 authorities.add( new SimpleGrantedAuthority(permiso.getPermiso()));
             });
