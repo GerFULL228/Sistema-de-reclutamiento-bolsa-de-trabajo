@@ -5,6 +5,9 @@ import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundExcept
 import com.example.sistemadereclutamiento.shared.response.ApiErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,5 +58,33 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now().toString()
                 )
         );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorDTO> handleBadCredentials() {
+
+        ApiErrorDTO error = new ApiErrorDTO(
+                "AUTH_INVALID_CREDENTIALS",
+                "Usuario o contraseña incorrectos",
+                LocalDateTime.now().toString()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(error);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<ApiErrorDTO> handleAuthorizationDenied() {
+
+        ApiErrorDTO error = new ApiErrorDTO(
+                "AUTH_FORBIDDEN",
+                "No tienes permisos para esta acción",
+                LocalDateTime.now().toString()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(error);
     }
 }

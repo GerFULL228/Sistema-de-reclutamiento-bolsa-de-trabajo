@@ -1,11 +1,11 @@
-package com.example.sistemadereclutamiento.service;
+package com.example.sistemadereclutamiento.curriculum.service;
 
-import com.example.sistemadereclutamiento.dto.CurriculumVitaeRequestDTO;
-import com.example.sistemadereclutamiento.dto.CurriculumVitaeResponseDTO;
+import com.example.sistemadereclutamiento.curriculum.dto.CurriculumVitaeRequestDTO;
+import com.example.sistemadereclutamiento.curriculum.dto.CurriculumVitaeResponseDTO;
 import com.example.sistemadereclutamiento.exception.ResourceNotFoundException;
-import com.example.sistemadereclutamiento.model.CurriculumVitae;
+import com.example.sistemadereclutamiento.curriculum.entity.CurriculumVitae;
 import com.example.sistemadereclutamiento.model.Usuario;
-import com.example.sistemadereclutamiento.repository.CurriculumVitaeRepository;
+import com.example.sistemadereclutamiento.curriculum.repository.CurriculumVitaeRepository;
 import com.example.sistemadereclutamiento.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

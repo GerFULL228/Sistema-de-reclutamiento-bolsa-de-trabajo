@@ -1,5 +1,6 @@
-package com.example.sistemadereclutamiento.model;
+package com.example.sistemadereclutamiento.curriculum.entity;
 
+import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
