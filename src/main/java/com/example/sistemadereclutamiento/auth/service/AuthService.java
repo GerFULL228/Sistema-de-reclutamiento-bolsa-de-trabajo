@@ -54,7 +54,7 @@ public class AuthService {
         String token = jwtService.generateToken(custom);
 
         String username = jwtService.extractClaim(token, Claims::getSubject);
-        long expiredIn = props.getExpiration() / 1000;  // ← era jwtProperties, ahora props
+        long expiredIn = props.getExpiration() / 1000;
 
         List<String> roles = jwtService.extractClaim(token,
                 claims -> claims.get("roles", List.class));
@@ -103,7 +103,17 @@ public class AuthService {
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .toList();
+
+        List<String> permisos = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> !auth.startsWith("ROLE_"))
+                .toList();
+
+        String rol = (roles != null && !roles.isEmpty())
+                ? roles.get(0).replace("ROLE_", "")
+                : null;
 
         log.info("Tokens renovados para usuario: {}", usuario.getEmail());
 
@@ -113,7 +123,7 @@ public class AuthService {
                 .tokenType("bearer")
                 .expiresIn(props.getExpiration() / 1000)
                 .username(usuario.getEmail())
-                .roles(roles)
+                .rol(rol)
                 .build();
     }
 

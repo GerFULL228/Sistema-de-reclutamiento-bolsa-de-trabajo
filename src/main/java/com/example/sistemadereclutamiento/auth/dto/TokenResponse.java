@@ -16,7 +16,8 @@ public class TokenResponse {
     private long expiresIn;
     private String username;
 
-    private List<String> roles;
+    private String rol;
+    private List<String> permisos;
 
 
 }

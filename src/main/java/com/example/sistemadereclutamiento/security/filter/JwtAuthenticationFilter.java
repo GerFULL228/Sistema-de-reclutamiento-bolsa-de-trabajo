@@ -1,7 +1,7 @@
 package com.example.sistemadereclutamiento.security.filter;
 
 
-import com.example.sistemadereclutamiento.repository.UsuarioRepository;
+
 import com.example.sistemadereclutamiento.security.jtw.JwtService;
 import com.example.sistemadereclutamiento.security.service.CustomUserDetail;
 import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
