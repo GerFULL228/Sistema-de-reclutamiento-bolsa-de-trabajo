@@ -59,13 +59,15 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/uploads/**",
                                 "/api/empresas**",
-                                "/api/ofertas**"
+                                "/api/ofertas**",
+                                "/api/usuarios/postulante/register"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/usuarios/barbero",
                                 "/api/v1/usuarios/cliente",
                                 "/api/v1/usuarios/admin"
+
                         ).hasRole("admin")
 
                         .requestMatchers(HttpMethod.GET,
