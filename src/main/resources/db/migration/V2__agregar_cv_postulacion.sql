@@ -1,0 +1,1 @@
+ALTER TABLE postulaciones ADD COLUMN cv_url VARCHAR(255);
