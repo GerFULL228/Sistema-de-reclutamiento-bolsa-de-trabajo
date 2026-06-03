@@ -11,8 +11,6 @@ import java.util.Optional;
 public interface UsuarioRepositorio  extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
 
-
-
     @Query("""
      select u FROM Usuario u 
          join fetch u.roles r

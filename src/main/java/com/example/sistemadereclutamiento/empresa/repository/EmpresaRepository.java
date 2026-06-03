@@ -26,4 +26,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     )
     List<EmpresaResponseDTO> listarEmpresas();
 
+    boolean existsByIdAndUsuario_Email(Long id, String email);
+
 }
