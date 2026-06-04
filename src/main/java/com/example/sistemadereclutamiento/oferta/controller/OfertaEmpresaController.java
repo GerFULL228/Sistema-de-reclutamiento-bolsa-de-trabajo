@@ -1,43 +1,38 @@
 package com.example.sistemadereclutamiento.oferta.controller;
 
-import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.oferta.service.OfertaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/ofertas")
-public class OfertaController {
+@RequestMapping("/api/empresa/ofertas")
+@RequiredArgsConstructor
+public class OfertaEmpresaController {
 
-    @Autowired
-    private OfertaService ofertaService;
+    private final OfertaService ofertaService;
 
+    @PreAuthorize("hasAuthority('OFERTA_VIEW') and hasRole('EMPRESA')")
     @GetMapping
-public ResponseEntity<Page<OfertaResponseDTO>> listarOfertas(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "5") int size
-) {
+    public ResponseEntity<Page<OfertaResponseDTO>> listarOfertasEmpresa(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
 
-    Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-    return ResponseEntity.ok(
-            ofertaService.obtenerTodas(pageable)
-    );
-}
-
-    @GetMapping("/{id}")
-    public ResponseEntity<OfertaResponseDTO> obtenerOferta(@PathVariable Long id) {
-        return ResponseEntity.ok(ofertaService.obtenerPorId(id));
+        return ResponseEntity.ok(
+                ofertaService.obtenerOfertasEmpresa(pageable)
+        );
     }
-
 
     @PreAuthorize("hasAuthority('OFERTA_CREATE')")
     @PostMapping

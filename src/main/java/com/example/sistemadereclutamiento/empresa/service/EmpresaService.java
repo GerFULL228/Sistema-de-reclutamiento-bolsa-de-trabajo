@@ -45,7 +45,9 @@ public class EmpresaService {
          usuarioMapper.toEntity(requestDTO.getUsuario());
         Rol rol = rolRepository.findByNombre("EMPRESA").orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
         usuario.setRoles(Set.of(rol));
+
         usuario.setPassword(passwordEncoder.encode(requestDTO.getUsuario().getPassword()));
+
         empresa.setUsuario(usuario);
         empresa.setEstadoValidacion(EstadoValidacion.PENDIENTE);
 

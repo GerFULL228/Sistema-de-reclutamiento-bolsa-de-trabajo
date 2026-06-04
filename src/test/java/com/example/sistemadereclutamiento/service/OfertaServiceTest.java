@@ -42,7 +42,7 @@ class OfertaServiceTest {
         request.setDescripcion("Java");
         request.setUbicacion("Lima");
         request.setSalario(3000.0);
-        request.setEmpresaId(1L);
+
 
         Empresa empresa = new Empresa();
         empresa.setId(1L);

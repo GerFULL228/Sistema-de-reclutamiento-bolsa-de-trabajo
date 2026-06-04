@@ -10,5 +10,5 @@ public class OfertaRequestDTO {
     private String ubicacion;
     private Double salario;
     private String estado;
-    private Long empresaId;
+
 }
