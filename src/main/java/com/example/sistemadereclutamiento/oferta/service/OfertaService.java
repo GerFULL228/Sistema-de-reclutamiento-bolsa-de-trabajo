@@ -4,6 +4,9 @@ import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
 import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
+import com.example.sistemadereclutamiento.usuario.entity.Usuario;
+import com.example.sistemadereclutamiento.usuario.service.UsuarioSecurity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
@@ -17,23 +20,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class OfertaService {
 
-    @Autowired
-    private OfertaRepository ofertaRepository;
 
-    @Autowired
-    private EmpresaRepository empresaRepository;
+    private final OfertaRepository ofertaRepository;
 
-    @Autowired
-    private OfertaMapper ofertaMapper;
+
+    private final EmpresaRepository empresaRepository;
+
+
+    private final OfertaMapper ofertaMapper;
+
+    private final UsuarioSecurity usuarioSecurity;
 
     public OfertaResponseDTO guardarOferta(OfertaRequestDTO requestDTO) {
 
-        Empresa empresa = empresaRepository.findById(requestDTO.getEmpresaId())
+        Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
+
+        Empresa empresa = empresaRepository.findEmpresasByUsuario_Id(usuarioLogueado.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "No se encontró la empresa con ID: " + requestDTO.getEmpresaId()));
+                                "Usted no tiene ninguna empresa registrada"));
+
+        if (!usuarioSecurity.isEmpresa()) {
+            throw new BusinessException("solo empresas pueden crear ofertas");
+        }
 
         Oferta oferta = ofertaMapper.toEntity(requestDTO);
         oferta.setEmpresa(empresa);
@@ -45,9 +57,15 @@ public class OfertaService {
         return ofertaMapper.toDTO(nuevaOferta);
     }
 
-    public Page<OfertaResponseDTO> obtenerTodas(Pageable pageable) {
-    return ofertaRepository.listarOfertas(pageable);
-}
+    public Page<OfertaResponseDTO> obtenerOfertasAdmin(Pageable pageable) {
+        return ofertaRepository.listarOfertas(pageable);
+    }
+
+    public Page<OfertaResponseDTO> obtenerOfertasEmpresa(Pageable pageable) {
+
+        Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
+        return ofertaRepository.listarOfertasEmpresa(pageable,usuarioLogueado.getId());
+    }
 
     public OfertaResponseDTO obtenerPorId(Long id) {
 
@@ -72,7 +90,6 @@ public class OfertaService {
         }
 
         ofertaMapper.updateEntityFromDto(requestDTO, oferta);
-
 
 
         return ofertaMapper.toDTO(ofertaRepository.save(oferta));

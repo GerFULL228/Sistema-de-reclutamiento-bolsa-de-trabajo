@@ -14,10 +14,9 @@ public interface OfertaMapper {
     @Mapping(source = "empresa.nombreEmpresa", target = "nombreEmpresa")
     OfertaResponseDTO toDTO(Oferta oferta);
 
-    @Mapping(source = "empresaId", target = "empresa.id")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "estado", ignore = true)
-    @Mapping(target = "empresa", source = "empresaId")
+    @Mapping(target = "empresa", ignore = true)
     Oferta toEntity(OfertaRequestDTO request);
 
     @BeanMapping(nullValuePropertyMappingStrategy= NullValuePropertyMappingStrategy.IGNORE)

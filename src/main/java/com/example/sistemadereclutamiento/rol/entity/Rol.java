@@ -2,7 +2,7 @@ package com.example.sistemadereclutamiento.rol.entity;
 
 import com.example.sistemadereclutamiento.permiso.entity.Permiso;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

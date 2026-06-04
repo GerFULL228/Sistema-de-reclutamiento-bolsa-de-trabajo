@@ -43,55 +43,51 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+
                 .exceptionHandling(exception ->
                         exception
                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                 .accessDeniedHandler(jwtAccesDeniedHandler)
                 )
-                .csrf(crsf -> crsf.disable())
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .userDetailsService(UserDetailService)
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
+
+
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/uploads/**",
-                                "/api/empresas**",
-                                "/api/ofertas**",
-                                "/api/usuarios/postulante/register"
+                                "/uploads/**"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/usuarios/barbero",
-                                "/api/v1/usuarios/cliente",
-                                "/api/v1/usuarios/admin"
 
-                        ).hasRole("admin")
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/usuarios/**"
-                        ).hasAnyRole("admin")
-
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/v1/usuarios/**"
-                        ).hasRole("admin")
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/servicios/**",
-                                "/api/v1/categorias/**",
-                                "/api/v1/barberos/**",
-                                "/api/v1/productos/**"
+                        .requestMatchers(
+                                "/api/usuarios/postulante/register",
+                                "/api/usuarios/empresa/register"
                         ).permitAll()
-                        .requestMatchers("/api/v1/barbero/citas/**").
-                        hasAnyAuthority("ROLE_barbero")
+
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ofertas/public/**"
+                        ).permitAll()
 
 
                         .anyRequest().authenticated()
-
                 )
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        filter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
         return http.build();
     }
     @Bean

@@ -1,6 +1,6 @@
 package com.example.sistemadereclutamiento.controller;
 
-import com.example.sistemadereclutamiento.oferta.controller.OfertaController;
+import com.example.sistemadereclutamiento.oferta.controller.OfertaAdminController;
 
 import com.example.sistemadereclutamiento.oferta.service.OfertaService;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(OfertaController.class)
+@WebMvcTest(OfertaAdminController.class)
 class OfertaControllerTest {
 
     @Autowired
@@ -28,7 +28,7 @@ class OfertaControllerTest {
     @Test
     void testListarOfertas() throws Exception {
 
-        when(ofertaService.obtenerTodas(org.mockito.Mockito.any()))
+        when(ofertaService.obtenerOfertasAdmin(org.mockito.Mockito.any()))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
 
         mockMvc.perform(get("/api/ofertas"))
