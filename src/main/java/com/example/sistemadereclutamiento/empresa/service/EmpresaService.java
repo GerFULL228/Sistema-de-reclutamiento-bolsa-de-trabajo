@@ -33,8 +33,6 @@ public class EmpresaService {
     private final UsuarioRepositorio usuarioRepositorio;
     private final PasswordEncoder passwordEncoder;
 
-
-
     public EmpresaResponseDTO guardarEmpresa(EmpresaRequestDTO requestDTO) {
         Empresa empresa = empresaMapper.toEntity(requestDTO);
         if (usuarioRepositorio.findByEmail(requestDTO.getUsuario().getEmail()).isPresent()) {
@@ -42,8 +40,9 @@ public class EmpresaService {
         }
 
         Usuario usuario = usuarioMapper.toEntity(requestDTO.getUsuario());
-         usuarioMapper.toEntity(requestDTO.getUsuario());
-        Rol rol = rolRepository.findByNombre("EMPRESA").orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
+        usuarioMapper.toEntity(requestDTO.getUsuario());
+        Rol rol = rolRepository.findByNombre("EMPRESA")
+                .orElseThrow(() -> new ResourceNotFoundException("ROL NO ENCONTRADO"));
         usuario.setRoles(Set.of(rol));
 
         usuario.setPassword(passwordEncoder.encode(requestDTO.getUsuario().getPassword()));
@@ -73,12 +72,23 @@ public class EmpresaService {
         return empresaMapper.toDTO(empresaRepository.save(empresaExistente));
     }
 
+    public EmpresaResponseDTO actualizarEstado(Long id, EstadoValidacion nuevoEstado) {
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la empresa con el ID: " + id));
+
+        if (empresa.getEstadoValidacion() == nuevoEstado) {
+            throw new BusinessException("La empresa ya se encuentra en estado " + nuevoEstado);
+        }
+
+        empresa.setEstadoValidacion(nuevoEstado);
+
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
+    }
+
     public void eliminarEmpresa(Long id) {
         Empresa empresaExistente = empresaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró la empresa con el ID: " + id));
         empresaRepository.delete(empresaExistente);
     }
-
-    
 
 }

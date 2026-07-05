@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CurriculumVitaeResponseDTO {
-
+    private Long usuarioId;
     private Long id;
     private String tituloProfesional;
     private String descripcion;

@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.empresa.controller;
 
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaEstadoUpdateDTO;
 import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
 import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
 import com.example.sistemadereclutamiento.empresa.service.EmpresaService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaEstadoUpdateDTO;
 
 import java.util.List;
 
@@ -32,15 +34,25 @@ public class EmpresaController {
     }
 
     @PostMapping
-    public ResponseEntity<EmpresaResponseDTO> crearEmpresa( @RequestBody @Valid EmpresaRequestDTO requestDTO) {
+    public ResponseEntity<EmpresaResponseDTO> crearEmpresa(@RequestBody @Valid EmpresaRequestDTO requestDTO) {
         EmpresaResponseDTO nuevaEmpresa = empresaService.guardarEmpresa(requestDTO);
         return new ResponseEntity<>(nuevaEmpresa, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('EMPRESA_UPDATE')")
     @PutMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> actualizarEmpresa(  @PathVariable Long id, @RequestBody  @Valid EmpresaRequestDTO requestDTO) {
+    public ResponseEntity<EmpresaResponseDTO> actualizarEmpresa(@PathVariable Long id,
+            @RequestBody @Valid EmpresaRequestDTO requestDTO) {
         return ResponseEntity.ok(empresaService.actualizarEmpresa(id, requestDTO));
+    }
+
+    @PreAuthorize("hasAuthority('VALIDAR_EMPRESA')")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<EmpresaResponseDTO> actualizarEstadoEmpresa(
+            @PathVariable Long id,
+            @RequestBody @Valid EmpresaEstadoUpdateDTO dto) {
+
+        return ResponseEntity.ok(empresaService.actualizarEstado(id, dto.getEstadoValidacion()));
     }
 
     @DeleteMapping("/{id}")
