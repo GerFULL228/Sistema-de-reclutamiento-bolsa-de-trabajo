@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.repository;
 
+import com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
@@ -82,4 +83,18 @@ public interface OfertaRepository extends JpaRepository<Oferta, Long> {
     long countByEmpresa_Usuario_Id(Long usuarioId);
 
     long countByEmpresa_Usuario_IdAndEstado(Long usuarioId, OfertaEstado estado);
+
+    // Antes obtenerEstadisticasEmpresa() hacía 3 COUNT(*) separados (total, activas,
+    // cerradas). Aquí se calculan los 3 en UNA sola pasada sobre la tabla con
+    // COUNT(CASE WHEN ...), reduciendo 3 round-trips a la BD a 1 para el panel de empresa.
+    @Query("""
+            SELECT new com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO(
+                        count(o),
+                        count(case when o.estado = com.example.sistemadereclutamiento.oferta.entity.OfertaEstado.ACTIVA then 1 end),
+                        count(case when o.estado = com.example.sistemadereclutamiento.oferta.entity.OfertaEstado.CERRADA then 1 end)
+                    )
+            FROM Oferta o
+            WHERE o.empresa.usuario.id = :usuarioId
+            """)
+    EmpresaOfertaStatsDTO obtenerEstadisticasPorUsuario(@Param("usuarioId") Long usuarioId);
 }

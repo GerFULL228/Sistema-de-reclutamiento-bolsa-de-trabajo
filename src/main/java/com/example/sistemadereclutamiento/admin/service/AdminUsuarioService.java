@@ -15,6 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AdminUsuarioService {
@@ -24,7 +28,21 @@ public class AdminUsuarioService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public Page<UsuarioAdminResponseDTO> listarUsuarios(String rol, Boolean activo, Pageable pageable) {
-        return usuarioRepositorio.findAllExceptAdmin(rol, activo, pageable).map(this::toDTO);
+        Page<Usuario> pagina = usuarioRepositorio.findAllExceptAdmin(rol, activo, pageable);
+
+        // En vez de consultar la Empresa de cada usuario EMPRESA una por una (N+1),
+        // se resuelven todas en una sola query IN (...) y se mapea en memoria.
+        List<Long> usuarioIdsEmpresa = pagina.getContent().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "EMPRESA".equalsIgnoreCase(r.getNombre())))
+                .map(Usuario::getId)
+                .toList();
+
+        Map<Long, String> nombreEmpresaPorUsuarioId = usuarioIdsEmpresa.isEmpty()
+                ? Map.of()
+                : empresaRepository.findByUsuario_IdIn(usuarioIdsEmpresa).stream()
+                        .collect(Collectors.toMap(e -> e.getUsuario().getId(), Empresa::getNombreEmpresa));
+
+        return pagina.map(usuario -> toDTO(usuario, nombreEmpresaPorUsuarioId));
     }
 
     @Transactional
@@ -50,6 +68,8 @@ public class AdminUsuarioService {
         return toDTO(usuario);
     }
 
+    // Usado solo por cambiarEstado (una sola fila): aquí SÍ es aceptable la consulta
+    // individual, ya que no forma parte de un listado paginado.
     private UsuarioAdminResponseDTO toDTO(Usuario usuario) {
         String rol = usuario.getRoles().stream()
                 .map(Rol::getNombre)
@@ -63,6 +83,23 @@ public class AdminUsuarioService {
                     .orElse(null);
         }
 
+        return construirDTO(usuario, rol, nombreEmpresa);
+    }
+
+    private UsuarioAdminResponseDTO toDTO(Usuario usuario, Map<Long, String> nombreEmpresaPorUsuarioId) {
+        String rol = usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .findFirst()
+                .orElse("SIN_ROL");
+
+        String nombreEmpresa = "EMPRESA".equalsIgnoreCase(rol)
+                ? nombreEmpresaPorUsuarioId.get(usuario.getId())
+                : null;
+
+        return construirDTO(usuario, rol, nombreEmpresa);
+    }
+
+    private UsuarioAdminResponseDTO construirDTO(Usuario usuario, String rol, String nombreEmpresa) {
         return new UsuarioAdminResponseDTO(
                 usuario.getId(),
                 usuario.getNombre(),

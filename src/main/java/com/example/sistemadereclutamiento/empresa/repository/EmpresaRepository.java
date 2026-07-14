@@ -35,6 +35,10 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 
     Optional<Empresa> findEmpresasByUsuario_Id(Long id);
 
+    // Carga en lote (1 sola query, WHERE usuario_id IN (...)) el nombre de empresa
+    // de varios usuarios a la vez, para evitar N+1 al mapear listados admin.
+    List<Empresa> findByUsuario_IdIn(List<Long> usuarioIds);
+
     boolean existsByRuc(String ruc);
 
     long countByEstadoValidacion(EstadoValidacion estadoValidacion);
@@ -42,9 +46,12 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     // Panel admin (pestaña "Empresas"): permite filtrar por cuenta habilitada/deshabilitada
     // (usuario.activo) y por estado de validación (PENDIENTE/ACTIVO/RECHAZADO). Ambos filtros
     // son opcionales: si se envía null, esa condición se ignora.
+    // "join fetch e.usuario" trae la Empresa y su Usuario en UNA sola consulta SQL
+    // (relación *-a-uno, no dispara el warning de paginación en memoria de Hibernate),
+    // evitando una query extra por fila al leer usuario.email/activo/fechaCreacion en el DTO.
     @Query("""
         select e from Empresa e
-            join e.usuario u
+            join fetch e.usuario u
                 where (:activo is null or u.activo = :activo)
                 and (:estado is null or e.estadoValidacion = :estado)
                 order by u.fechaCreacion desc

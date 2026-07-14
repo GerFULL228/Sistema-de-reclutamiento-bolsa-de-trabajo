@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -105,9 +106,7 @@ public class PostulacionServiceImpl implements PostulacionService {
 
     @Override
     public List<PostulacionResponseDTO> obtenerPorPostulante(Long postulanteId) {
-        return postulacionRepository.findByPostulanteId(postulanteId).stream()
-                .map(this::mapearADto)
-                .collect(Collectors.toList());
+        return mapearListaADto(postulacionRepository.findByPostulanteId(postulanteId));
     }
 
     @Override
@@ -118,9 +117,7 @@ public class PostulacionServiceImpl implements PostulacionService {
         // Evita que una empresa vea los postulantes (nombre, email, CV) de una oferta ajena.
         validarOfertaPropiaDeLaEmpresa(oferta);
 
-        return postulacionRepository.findByOfertaId(ofertaId).stream()
-                .map(this::mapearADto)
-                .collect(Collectors.toList());
+        return mapearListaADto(postulacionRepository.findByOfertaId(ofertaId));
     }
 
     @Override
@@ -132,9 +129,7 @@ public class PostulacionServiceImpl implements PostulacionService {
 
     @Override
     public List<PostulacionResponseDTO> obtenerPorEstadoYEmpresa(EstadoPostulacion estado, Long empresaId) {
-        return postulacionRepository.findByEstadoAndOfertaEmpresaId(estado, empresaId).stream()
-                .map(this::mapearADto)
-                .collect(Collectors.toList());
+        return mapearListaADto(postulacionRepository.findByEstadoAndOfertaEmpresaId(estado, empresaId));
     }
 
     @Override
@@ -193,7 +188,37 @@ public class PostulacionServiceImpl implements PostulacionService {
         }
     }
 
+    // Mapea una lista completa de postulaciones haciendo UNA sola query batch para
+    // resolver los CV de todos los postulantes involucrados (en vez de 1 query por fila,
+    // como ocurría antes al llamar curriculumVitaeRepository.findByUsuario_Id por cada una).
+    private List<PostulacionResponseDTO> mapearListaADto(List<Postulacion> postulaciones) {
+        if (postulaciones.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> usuarioIds = postulaciones.stream()
+                .map(p -> p.getPostulante().getUsuario().getId())
+                .distinct()
+                .toList();
+
+        Map<Long, Long> curriculumIdPorUsuarioId = curriculumVitaeRepository.findByUsuario_IdIn(usuarioIds).stream()
+                .collect(Collectors.toMap(cv -> cv.getUsuario().getId(), CurriculumVitae::getId));
+
+        return postulaciones.stream()
+                .map(p -> mapearADto(p, curriculumIdPorUsuarioId))
+                .collect(Collectors.toList());
+    }
+
     private PostulacionResponseDTO mapearADto(Postulacion p) {
+        Usuario usuarioPostulante = p.getPostulante().getUsuario();
+        Long curriculumId = curriculumVitaeRepository.findByUsuario_Id(usuarioPostulante.getId())
+                .map(CurriculumVitae::getId)
+                .orElse(null);
+        // Collections.singletonMap (a diferencia de Map.of) admite un valor null.
+        return mapearADto(p, java.util.Collections.singletonMap(usuarioPostulante.getId(), curriculumId));
+    }
+
+    private PostulacionResponseDTO mapearADto(Postulacion p, Map<Long, Long> curriculumIdPorUsuarioId) {
         PostulacionResponseDTO dto = new PostulacionResponseDTO();
         dto.setId(p.getId());
         dto.setPostulanteId(p.getPostulante().getId());
@@ -210,9 +235,10 @@ public class PostulacionServiceImpl implements PostulacionService {
         dto.setCvUrl(p.getCvUrl());
         // Si el postulante llenó su "Mi Perfil / CV", enlazamos ese currículum
         // estructurado para que la empresa pueda consultarlo aunque no haya cvUrl.
-        curriculumVitaeRepository.findByUsuario_Id(usuarioPostulante.getId())
-                .map(CurriculumVitae::getId)
-                .ifPresent(dto::setCurriculumId);
+        Long curriculumId = curriculumIdPorUsuarioId.get(usuarioPostulante.getId());
+        if (curriculumId != null) {
+            dto.setCurriculumId(curriculumId);
+        }
         dto.setEstado(p.getEstado().name());
         dto.setFechaPostulacion(p.getFechaPostulacion());
         return dto;

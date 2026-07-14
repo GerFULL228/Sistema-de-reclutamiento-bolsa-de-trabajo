@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +21,7 @@ public class Rol {
     @Column(nullable = false)
     private String nombre;
 
+    @BatchSize(size = 30)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "rol_permisos",

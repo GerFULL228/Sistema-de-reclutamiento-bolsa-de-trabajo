@@ -97,11 +97,8 @@ public class OfertaService {
     public EmpresaOfertaStatsDTO obtenerEstadisticasEmpresa() {
         Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
 
-        long total = ofertaRepository.countByEmpresa_Usuario_Id(usuarioLogueado.getId());
-        long activas = ofertaRepository.countByEmpresa_Usuario_IdAndEstado(usuarioLogueado.getId(), OfertaEstado.ACTIVA);
-        long cerradas = ofertaRepository.countByEmpresa_Usuario_IdAndEstado(usuarioLogueado.getId(), OfertaEstado.CERRADA);
-
-        return new EmpresaOfertaStatsDTO(total, activas, cerradas);
+        // 1 sola consulta con 3 COUNT(CASE WHEN ...) en vez de 3 queries separadas.
+        return ofertaRepository.obtenerEstadisticasPorUsuario(usuarioLogueado.getId());
     }
 
     public OfertaResponseDTO actualizarOferta(Long id, OfertaUpdateDTO requestDTO) {
