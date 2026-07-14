@@ -1,6 +1,8 @@
 package com.example.sistemadereclutamiento.usuario.repository;
 
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,4 +20,12 @@ public interface UsuarioRepositorio  extends JpaRepository<Usuario, Long> {
                  where u.email= :email
     """)
     Optional<Usuario> existsByEmailAndPermiso(String email);
+
+    // Panel admin: lista postulantes y empresas, pero nunca otras cuentas de administrador.
+    @Query("""
+        select distinct u from Usuario u
+            join u.roles r
+                where r.nombre <> 'ADMIN'
+    """)
+    Page<Usuario> findAllExceptAdmin(Pageable pageable);
 }

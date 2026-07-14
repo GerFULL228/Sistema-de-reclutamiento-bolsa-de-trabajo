@@ -5,8 +5,10 @@ package com.example.sistemadereclutamiento.security.filter;
 import com.example.sistemadereclutamiento.security.jtw.JwtService;
 import com.example.sistemadereclutamiento.security.service.CustomUserDetail;
 import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
+import com.example.sistemadereclutamiento.shared.response.ApiErrorDTO;
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import com.example.sistemadereclutamiento.usuario.repository.UsuarioRepositorio;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -39,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UsuarioRepositorio usuarioRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -79,6 +82,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String username = jwtService.extractClaim(jwt, Claims::getSubject);
 
             Usuario usuario = usuarioRepository.existsByEmailAndPermiso(username).orElseThrow(()->new ResourceNotFoundException("no existe el usuario"));
+
+            // Si un admin deshabilita la cuenta mientras el usuario ya tiene un access token
+            // vigente, se corta el acceso de inmediato en vez de esperar a que el token expire.
+            if (!usuario.isActivo()) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                ApiErrorDTO error = new ApiErrorDTO(
+                        "ACCOUNT_DISABLED",
+                        "Tu cuenta ha sido deshabilitada por un administrador.",
+                        java.time.LocalDateTime.now().toString()
+                );
+                response.getWriter().write(objectMapper.writeValueAsString(error));
+                return;
+            }
 
             final List<String> permisos = jwtService.extractClaim(jwt, claims -> claims.get("permisos", List.class));
             List<GrantedAuthority> authorities = new ArrayList<>();

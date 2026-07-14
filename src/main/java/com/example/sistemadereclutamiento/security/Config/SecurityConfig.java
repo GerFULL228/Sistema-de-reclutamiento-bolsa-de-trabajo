@@ -87,6 +87,13 @@ public class SecurityConfig {
                         ).permitAll()
 
 
+                        // Formulario público de contacto (footer / página /contacto del frontend)
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/contacto"
+                        ).permitAll()
+
+
                         .anyRequest().authenticated()
                 )
 

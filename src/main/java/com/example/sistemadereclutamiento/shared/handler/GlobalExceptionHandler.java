@@ -6,7 +6,11 @@ import com.example.sistemadereclutamiento.shared.response.ApiErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -93,6 +97,54 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .body(error);
+    }
+
+    // Cuenta deshabilitada o bloqueada (Usuario.activo = false).
+    // Se devuelve un código específico "ACCOUNT_DISABLED" para que el frontend
+    // pueda mostrar el mensaje exacto y redirigir a /contacto.
+    // Cubre tanto DisabledException (isEnabled() = false) como LockedException
+    // (isAccountNonLocked() = false), que Spring Security lanza durante las
+    // preAuthenticationChecks del AuthenticationManager.
+    @ExceptionHandler({DisabledException.class, LockedException.class})
+    public ResponseEntity<ApiErrorDTO> handleDisabledException(AccountStatusException ex) {
+        return accountDisabledResponse();
+    }
+
+    // Red de seguridad: si el estado deshabilitado/bloqueado del usuario llega envuelto
+    // en un InternalAuthenticationServiceException (por ejemplo, porque se lanzó una
+    // excepción de cuenta dentro de un UserDetailsService.loadUserByUsername, donde
+    // DaoAuthenticationProvider.retrieveUser() envuelve cualquier excepción que no sea
+    // UsernameNotFoundException), desenvolvemos la causa real y respondemos igual con
+    // 403 ACCOUNT_DISABLED en vez de dejar que caiga en el 500 genérico.
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<ApiErrorDTO> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof AccountStatusException) {
+            return accountDisabledResponse();
+        }
+
+        ApiErrorDTO error = new ApiErrorDTO(
+                "AUTH_SERVICE_ERROR",
+                "Ocurrió un error al procesar la autenticación. Intenta nuevamente.",
+                LocalDateTime.now().toString()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
+
+    private ResponseEntity<ApiErrorDTO> accountDisabledResponse() {
+        ApiErrorDTO error = new ApiErrorDTO(
+                "ACCOUNT_DISABLED",
+                "Tu cuenta ha sido deshabilitada por un administrador.",
+                LocalDateTime.now().toString()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(error);
     }
 
