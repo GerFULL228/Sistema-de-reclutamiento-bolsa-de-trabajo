@@ -1,6 +1,8 @@
 package com.example.sistemadereclutamiento.empresa.controller;
 
+import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaPerfilRequestDTO;
 import com.example.sistemadereclutamiento.empresa.dto.request.EmpresaRequestDTO;
+import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaPerfilResponseDTO;
 import com.example.sistemadereclutamiento.empresa.dto.response.EmpresaResponseDTO;
 import com.example.sistemadereclutamiento.empresa.service.EmpresaService;
 import jakarta.validation.Valid;
@@ -19,10 +21,23 @@ public class EmpresaController {
     @Autowired
     private EmpresaService empresaService;
 
-    @PreAuthorize("hasAuthority('EMPRESA_VIEW_ALL')")
+    // Listado público: el catálogo de empresas se muestra sin necesidad de autenticación.
     @GetMapping
     public ResponseEntity<List<EmpresaResponseDTO>> listarEmpresas() {
         return ResponseEntity.ok(empresaService.obtenerTodas());
+    }
+
+    // Configuración de Cuenta: la empresa autenticada ve/edita su propio perfil.
+    @PreAuthorize("hasRole('EMPRESA')")
+    @GetMapping("/mi-perfil")
+    public ResponseEntity<EmpresaPerfilResponseDTO> obtenerMiPerfil() {
+        return ResponseEntity.ok(empresaService.obtenerMiPerfil());
+    }
+
+    @PreAuthorize("hasRole('EMPRESA')")
+    @PutMapping("/mi-perfil")
+    public ResponseEntity<EmpresaPerfilResponseDTO> actualizarMiPerfil(@RequestBody @Valid EmpresaPerfilRequestDTO dto) {
+        return ResponseEntity.ok(empresaService.actualizarMiPerfil(dto));
     }
 
     @PreAuthorize("hasAuthority('EMPRESA_VIEW')")

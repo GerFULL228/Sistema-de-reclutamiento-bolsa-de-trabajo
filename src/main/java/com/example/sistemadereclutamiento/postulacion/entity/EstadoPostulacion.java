@@ -5,5 +5,6 @@ public enum EstadoPostulacion {
     EN_REVISION,
     ENTREVISTA,
     RECHAZADO,
-    ACEPTADO
+    ACEPTADO,
+    CANCELADO
 }

@@ -23,4 +23,6 @@ public interface PostulacionRepository extends JpaRepository<Postulacion, Long> 
     List<Postulacion> findByEstadoAndOfertaEmpresaId(EstadoPostulacion estado, Long empresaId);
 
     boolean existsByPostulanteIdAndOfertaId(Long postulanteId, Long ofertaId);
+
+    Optional<Postulacion> findByPostulanteIdAndOfertaId(Long postulanteId, Long ofertaId);
 }

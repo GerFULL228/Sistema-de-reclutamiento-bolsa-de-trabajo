@@ -1,6 +1,7 @@
 package com.example.sistemadereclutamiento.oferta.service;
 
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
+import com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO;
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
 import com.example.sistemadereclutamiento.oferta.mapper.OfertaMapper;
 import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
@@ -16,22 +17,16 @@ import com.example.sistemadereclutamiento.empresa.entity.Empresa;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
 import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
 import com.example.sistemadereclutamiento.oferta.repository.OfertaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OfertaService {
 
-
     private final OfertaRepository ofertaRepository;
-
-
     private final EmpresaRepository empresaRepository;
-
-
     private final OfertaMapper ofertaMapper;
-
     private final UsuarioSecurity usuarioSecurity;
 
     public OfertaResponseDTO guardarOferta(OfertaRequestDTO requestDTO) {
@@ -49,7 +44,6 @@ public class OfertaService {
 
         Oferta oferta = ofertaMapper.toEntity(requestDTO);
         oferta.setEmpresa(empresa);
-
         oferta.setEstado(OfertaEstado.ACTIVA);
 
         Oferta nuevaOferta = ofertaRepository.save(oferta);
@@ -62,19 +56,51 @@ public class OfertaService {
     }
 
     public Page<OfertaResponseDTO> obtenerOfertasEmpresa(Pageable pageable) {
-
         Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
-        return ofertaRepository.listarOfertasEmpresa(pageable,usuarioLogueado.getId());
+        return ofertaRepository.listarOfertasEmpresa(pageable, usuarioLogueado.getId());
+    }
+
+    public Page<OfertaResponseDTO> obtenerOfertasPublicas(Pageable pageable) {
+        return ofertaRepository.listarOfertasActivas(pageable);
+    }
+
+    public OfertaResponseDTO obtenerOfertaPublicaPorId(Long id) {
+        return ofertaRepository.findActivaById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No se encontró la oferta activa con ID: " + id));
     }
 
     public OfertaResponseDTO obtenerPorId(Long id) {
-
         Oferta oferta = ofertaRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
         return ofertaMapper.toDTO(oferta);
+    }
+
+    // Usado por la empresa para precargar el formulario de edición: solo puede
+    // ver el detalle completo (incluso si no está ACTIVA) de sus PROPIAS ofertas.
+    public OfertaResponseDTO obtenerOfertaEmpresaPorId(Long id) {
+        Oferta oferta = ofertaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No se encontró la oferta con ID: " + id));
+
+        validarPropietario(oferta);
+
+        return ofertaMapper.toDTO(oferta);
+    }
+
+    public EmpresaOfertaStatsDTO obtenerEstadisticasEmpresa() {
+        Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
+
+        long total = ofertaRepository.countByEmpresa_Usuario_Id(usuarioLogueado.getId());
+        long activas = ofertaRepository.countByEmpresa_Usuario_IdAndEstado(usuarioLogueado.getId(), OfertaEstado.ACTIVA);
+        long cerradas = ofertaRepository.countByEmpresa_Usuario_IdAndEstado(usuarioLogueado.getId(), OfertaEstado.CERRADA);
+
+        return new EmpresaOfertaStatsDTO(total, activas, cerradas);
     }
 
     public OfertaResponseDTO actualizarOferta(Long id, OfertaUpdateDTO requestDTO) {
@@ -84,6 +110,7 @@ public class OfertaService {
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
+        validarPropietario(oferta);
 
         if (oferta.getEstado() == OfertaEstado.CERRADA || oferta.getEstado() == OfertaEstado.ELIMINADA) {
             throw new BusinessException("esta oferta ya no se puede modificar");
@@ -91,19 +118,32 @@ public class OfertaService {
 
         ofertaMapper.updateEntityFromDto(requestDTO, oferta);
 
-
         return ofertaMapper.toDTO(ofertaRepository.save(oferta));
     }
 
     public void eliminarOferta(Long id) {
-
         Oferta oferta = ofertaRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No se encontró la oferta con ID: " + id));
 
+        validarPropietario(oferta);
+
         ofertaRepository.delete(oferta);
     }
 
+    // Evita que una empresa autenticada pueda editar/eliminar/consultar en detalle
+    // ofertas que pertenecen a OTRA empresa (antes no se validaba en absoluto).
+    private void validarPropietario(Oferta oferta) {
+        if (usuarioSecurity.isAdmin()) {
+            return;
+        }
 
+        Usuario usuarioLogueado = usuarioSecurity.usuarioLogado();
+        Long propietarioId = oferta.getEmpresa().getUsuario().getId();
+
+        if (!propietarioId.equals(usuarioLogueado.getId())) {
+            throw new AccessDeniedException("No tienes permiso para gestionar esta oferta");
+        }
+    }
 }

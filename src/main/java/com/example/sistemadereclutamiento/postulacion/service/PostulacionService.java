@@ -14,4 +14,8 @@ public interface PostulacionService {
     List<PostulacionResponseDTO> obtenerPorOferta(Long ofertaId);
     PostulacionResponseDTO obtenerDetalle(Long id);
     List<PostulacionResponseDTO> obtenerPorEstadoYEmpresa(EstadoPostulacion estado, Long empresaId);
+
+    // Fase 3: listado propio y anulación por parte del postulante autenticado
+    List<PostulacionResponseDTO> misPostulaciones();
+    PostulacionResponseDTO cancelarPostulacion(Long id);
 }

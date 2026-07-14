@@ -11,6 +11,8 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -47,6 +49,26 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now().toString())
         );
 
+    }
+
+    // Evita 500 cuando el body enviado tiene un formato inválido
+    // (ej. fechas vacías/mal formadas), devolviendo un 400 claro en su lugar.
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiErrorDTO("INVALID_REQUEST_BODY",
+                        "El formato de los datos enviados no es válido. Verifica los campos e intenta nuevamente.",
+                        LocalDateTime.now().toString())
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorDTO> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ApiErrorDTO("DATA_INTEGRITY_VIOLATION",
+                        "La operación no pudo completarse por una restricción de datos.",
+                        LocalDateTime.now().toString())
+        );
     }
 
     @ExceptionHandler(Exception.class)

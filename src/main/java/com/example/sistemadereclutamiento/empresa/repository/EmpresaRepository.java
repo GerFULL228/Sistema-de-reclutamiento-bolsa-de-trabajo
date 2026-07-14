@@ -31,4 +31,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 
     Optional<Empresa> findEmpresasByUsuario_Id(Long id);
 
+    boolean existsByRuc(String ruc);
+
 }

@@ -80,6 +80,13 @@ public class SecurityConfig {
                         ).permitAll()
 
 
+                        // Catálogo público de empresas (home, listado de empresas en el frontend)
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/empresas"
+                        ).permitAll()
+
+
                         .anyRequest().authenticated()
                 )
 

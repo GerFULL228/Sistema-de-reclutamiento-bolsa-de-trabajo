@@ -2,6 +2,7 @@ package com.example.sistemadereclutamiento.oferta.controller;
 
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
+import com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.OfertaResponseDTO;
 import com.example.sistemadereclutamiento.oferta.service.OfertaService;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+// Todos los endpoints de este controlador son exclusivos de ROLE_EMPRESA.
 @RestController
 @RequestMapping("/api/empresa/ofertas")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('EMPRESA')")
 public class OfertaEmpresaController {
 
     private final OfertaService ofertaService;
 
-    @PreAuthorize("hasAuthority('OFERTA_VIEW') and hasRole('EMPRESA')")
+    @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_VIEW')")
     @GetMapping
     public ResponseEntity<Page<OfertaResponseDTO>> listarOfertasEmpresa(
             @RequestParam(defaultValue = "0") int page,
@@ -34,7 +37,18 @@ public class OfertaEmpresaController {
         );
     }
 
-    @PreAuthorize("hasAuthority('OFERTA_CREATE')")
+    // Estadísticas para las tarjetas del Panel de Control (total / activas / cerradas).
+    @GetMapping("/stats")
+    public ResponseEntity<EmpresaOfertaStatsDTO> obtenerEstadisticas() {
+        return ResponseEntity.ok(ofertaService.obtenerEstadisticasEmpresa());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OfertaResponseDTO> obtenerOferta(@PathVariable Long id) {
+        return ResponseEntity.ok(ofertaService.obtenerOfertaEmpresaPorId(id));
+    }
+
+    @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_CREATE')")
     @PostMapping
     public ResponseEntity<OfertaResponseDTO> crearOferta(
             @RequestBody OfertaRequestDTO requestDTO) {
@@ -45,6 +59,7 @@ public class OfertaEmpresaController {
         return new ResponseEntity<>(nuevaOferta, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_UPDATE')")
     @PatchMapping("/{id}")
     public ResponseEntity<OfertaResponseDTO> actualizarOferta(
             @PathVariable Long id,
@@ -54,6 +69,7 @@ public class OfertaEmpresaController {
                 ofertaService.actualizarOferta(id, requestDTO));
     }
 
+    @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarOferta(@PathVariable Long id) {
 
