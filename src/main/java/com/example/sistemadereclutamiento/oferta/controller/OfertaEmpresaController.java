@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.controller;
 
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaEstadoUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaRequestDTO;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO;
@@ -67,6 +68,18 @@ public class OfertaEmpresaController {
 
         return ResponseEntity.ok(
                 ofertaService.actualizarOferta(id, requestDTO));
+    }
+
+    // Cambio rápido de estado (ej. ACTIVA -> CERRADA) desde la tabla de "Gestionar Ofertas".
+    // Solo el dueño de la oferta puede cambiarla (validado en OfertaService.validarPropietario).
+    @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_UPDATE')")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<OfertaResponseDTO> cambiarEstadoOferta(
+            @PathVariable Long id,
+            @RequestBody OfertaEstadoUpdateDTO requestDTO) {
+
+        return ResponseEntity.ok(
+                ofertaService.cambiarEstadoOferta(id, requestDTO));
     }
 
     @PreAuthorize("hasRole('EMPRESA') and hasAuthority('OFERTA_DELETE')")

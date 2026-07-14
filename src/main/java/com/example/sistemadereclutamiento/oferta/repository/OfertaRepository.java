@@ -22,6 +22,7 @@ public interface OfertaRepository extends JpaRepository<Oferta, Long> {
                           o.descripcion,
                           o.ubicacion,
                           o.salario,
+                        CAST(o.modalidad AS string),
                         CAST(o.estado AS string),
                           e.nombreEmpresa
                         ) FROM Oferta o
@@ -36,6 +37,7 @@ public interface OfertaRepository extends JpaRepository<Oferta, Long> {
                           o.descripcion,
                           o.ubicacion,
                           o.salario,
+                        CAST(o.modalidad AS string),
                         CAST(o.estado AS string),
                           e.nombreEmpresa
                         ) FROM Oferta o
@@ -51,6 +53,7 @@ public interface OfertaRepository extends JpaRepository<Oferta, Long> {
                           o.descripcion,
                           o.ubicacion,
                           o.salario,
+                        CAST(o.modalidad AS string),
                         CAST(o.estado AS string),
                           e.nombreEmpresa
                         ) FROM Oferta o
@@ -66,6 +69,7 @@ public interface OfertaRepository extends JpaRepository<Oferta, Long> {
                           o.descripcion,
                           o.ubicacion,
                           o.salario,
+                        CAST(o.modalidad AS string),
                         CAST(o.estado AS string),
                           e.nombreEmpresa
                         ) FROM Oferta o

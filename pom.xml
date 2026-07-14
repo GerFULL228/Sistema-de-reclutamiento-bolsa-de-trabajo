@@ -77,6 +77,7 @@
             <optional>true</optional>
         </dependency>
 
+
         <!-- MAPSTRUCT -->
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -134,6 +135,15 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                        </path>
+                        <!-- Necesario para que MapStruct vea correctamente los getters/setters
+                             generados por Lombok; sin esto se produce el error
+                             "No implementation was created for [Mapper] due to having a
+                             problem in the erroneous element null". -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>

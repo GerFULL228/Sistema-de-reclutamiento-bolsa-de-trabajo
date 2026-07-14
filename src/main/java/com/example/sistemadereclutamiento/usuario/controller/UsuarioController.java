@@ -22,7 +22,7 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/postulante/register")
-    public ResponseEntity<TokenResponsePostulante> registerUsuario(@RequestBody PostulanteRequest request){
+    public ResponseEntity<TokenResponsePostulante> registerUsuario(@Valid @RequestBody PostulanteRequest request){
         return ResponseEntity.ok(usuarioService.crearPostulante(request));
     }
 

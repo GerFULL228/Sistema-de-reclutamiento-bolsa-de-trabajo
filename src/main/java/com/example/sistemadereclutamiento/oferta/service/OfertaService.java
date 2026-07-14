@@ -1,5 +1,6 @@
 package com.example.sistemadereclutamiento.oferta.service;
 
+import com.example.sistemadereclutamiento.oferta.dto.request.OfertaEstadoUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.dto.request.OfertaUpdateDTO;
 import com.example.sistemadereclutamiento.oferta.dto.response.EmpresaOfertaStatsDTO;
 import com.example.sistemadereclutamiento.oferta.entity.OfertaEstado;
@@ -119,6 +120,44 @@ public class OfertaService {
         ofertaMapper.updateEntityFromDto(requestDTO, oferta);
 
         return ofertaMapper.toDTO(ofertaRepository.save(oferta));
+    }
+
+    // Usado por el switch/dropdown de "Gestionar Ofertas" para cambiar el estado
+    // de una vacante (ej. de ACTIVA a CERRADA) sin tocar el resto de sus datos.
+    public OfertaResponseDTO cambiarEstadoOferta(Long id, OfertaEstadoUpdateDTO requestDTO) {
+
+        Oferta oferta = ofertaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No se encontró la oferta con ID: " + id));
+
+        validarPropietario(oferta);
+
+        if (oferta.getEstado() == OfertaEstado.ELIMINADA) {
+            throw new BusinessException("Esta oferta fue eliminada y no se puede modificar su estado");
+        }
+
+        OfertaEstado nuevoEstado = parsearEstado(requestDTO.estado());
+
+        if (nuevoEstado == OfertaEstado.ELIMINADA) {
+            throw new BusinessException("Para eliminar una oferta utiliza la acción de eliminar");
+        }
+
+        oferta.setEstado(nuevoEstado);
+
+        return ofertaMapper.toDTO(ofertaRepository.save(oferta));
+    }
+
+    private OfertaEstado parsearEstado(String estado) {
+        if (estado == null || estado.isBlank()) {
+            throw new BusinessException("El estado es obligatorio");
+        }
+
+        try {
+            return OfertaEstado.valueOf(estado.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Estado inválido: " + estado);
+        }
     }
 
     public void eliminarOferta(Long id) {

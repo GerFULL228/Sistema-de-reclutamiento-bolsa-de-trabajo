@@ -13,6 +13,9 @@ public class PostulacionResponseDTO {
     private String ofertaTitulo;
     private String nombreEmpresa;
     private String cvUrl;
+    // Id del currículum estructurado (Mi Perfil / CV) del postulante, si lo completó.
+    // Permite a la empresa consultarlo vía GET /api/cv/{id} cuando no hay cvUrl.
+    private Long curriculumId;
     private String estado;
     private LocalDateTime fechaPostulacion;
 }

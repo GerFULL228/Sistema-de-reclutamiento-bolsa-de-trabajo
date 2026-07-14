@@ -1,5 +1,7 @@
 package com.example.sistemadereclutamiento.postulacion.service;
 
+import com.example.sistemadereclutamiento.curriculum.entity.CurriculumVitae;
+import com.example.sistemadereclutamiento.curriculum.repository.CurriculumVitaeRepository;
 import com.example.sistemadereclutamiento.oferta.entity.Oferta;
 import com.example.sistemadereclutamiento.oferta.repository.OfertaRepository;
 import com.example.sistemadereclutamiento.postulacion.dto.request.PostulacionRequestDTO;
@@ -38,6 +40,9 @@ public class PostulacionServiceImpl implements PostulacionService {
 
     @Autowired
     private UsuarioSecurity usuarioSecurity;
+
+    @Autowired
+    private CurriculumVitaeRepository curriculumVitaeRepository;
 
     @Override
     @Transactional // Aporta a la rúbrica de transaccionalidad
@@ -203,6 +208,11 @@ public class PostulacionServiceImpl implements PostulacionService {
         dto.setOfertaTitulo(p.getOferta().getTitulo());
         dto.setNombreEmpresa(p.getOferta().getEmpresa().getNombreEmpresa());
         dto.setCvUrl(p.getCvUrl());
+        // Si el postulante llenó su "Mi Perfil / CV", enlazamos ese currículum
+        // estructurado para que la empresa pueda consultarlo aunque no haya cvUrl.
+        curriculumVitaeRepository.findByUsuario_Id(usuarioPostulante.getId())
+                .map(CurriculumVitae::getId)
+                .ifPresent(dto::setCurriculumId);
         dto.setEstado(p.getEstado().name());
         dto.setFechaPostulacion(p.getFechaPostulacion());
         return dto;
