@@ -23,8 +23,8 @@ public class AdminUsuarioService {
     private final EmpresaRepository empresaRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public Page<UsuarioAdminResponseDTO> listarUsuarios(Pageable pageable) {
-        return usuarioRepositorio.findAllExceptAdmin(pageable).map(this::toDTO);
+    public Page<UsuarioAdminResponseDTO> listarUsuarios(String rol, Boolean activo, Pageable pageable) {
+        return usuarioRepositorio.findAllExceptAdmin(rol, activo, pageable).map(this::toDTO);
     }
 
     @Transactional

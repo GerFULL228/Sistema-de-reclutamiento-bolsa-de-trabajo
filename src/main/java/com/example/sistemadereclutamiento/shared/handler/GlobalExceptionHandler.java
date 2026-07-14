@@ -1,6 +1,7 @@
 package com.example.sistemadereclutamiento.shared.handler;
 
 import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
+import com.example.sistemadereclutamiento.shared.exeption.CompanyNotVerifiedException;
 import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import com.example.sistemadereclutamiento.shared.response.ApiErrorDTO;
 import org.springframework.http.HttpStatus;
@@ -133,6 +134,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
+
+    // Empresa aún no verificada por un administrador (Empresa.estadoValidacion = PENDIENTE).
+    // Código específico "COMPANY_NOT_VERIFIED" para que el frontend distinga este caso
+    // del de cuenta deshabilitada y muestre un mensaje acorde.
+    @ExceptionHandler(CompanyNotVerifiedException.class)
+    public ResponseEntity<ApiErrorDTO> handleCompanyNotVerifiedException(CompanyNotVerifiedException ex) {
+
+        ApiErrorDTO error = new ApiErrorDTO(
+                "COMPANY_NOT_VERIFIED",
+                ex.getMessage(),
+                LocalDateTime.now().toString()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(error);
     }
 

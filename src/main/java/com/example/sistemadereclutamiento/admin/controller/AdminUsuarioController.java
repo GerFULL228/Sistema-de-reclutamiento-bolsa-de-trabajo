@@ -23,11 +23,13 @@ public class AdminUsuarioController {
 
     @GetMapping
     public ResponseEntity<Page<UsuarioAdminResponseDTO>> listarUsuarios(
+            @RequestParam(required = false) String rol,
+            @RequestParam(required = false) Boolean activo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(adminUsuarioService.listarUsuarios(pageable));
+        return ResponseEntity.ok(adminUsuarioService.listarUsuarios(rol, activo, pageable));
     }
 
     @PatchMapping("/{id}/estado")
