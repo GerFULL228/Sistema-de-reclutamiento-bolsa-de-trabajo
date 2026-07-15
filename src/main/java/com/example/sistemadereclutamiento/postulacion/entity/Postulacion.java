@@ -28,7 +28,9 @@ public class Postulacion {
     @JoinColumn(name = "oferta_id", nullable = false)
     private Oferta oferta;
 
-    @Column(name = "fecha_postulacion", insertable = false, updatable = false)
+    // insertable=false porque la BD la completa con su valor DEFAULT al crear el registro;
+    // se permite actualizarla para poder refrescarla en una re-postulación (ver PostulacionServiceImpl).
+    @Column(name = "fecha_postulacion", insertable = false)
     private LocalDateTime fechaPostulacion;
 
     @Enumerated(EnumType.STRING)

@@ -3,6 +3,9 @@ package com.example.sistemadereclutamiento.auth.service;
 
 import com.example.sistemadereclutamiento.auth.dto.LoginRequest;
 import com.example.sistemadereclutamiento.auth.dto.TokenResponse;
+import com.example.sistemadereclutamiento.empresa.entity.Empresa;
+import com.example.sistemadereclutamiento.empresa.entity.EstadoValidacion;
+import com.example.sistemadereclutamiento.empresa.repository.EmpresaRepository;
 import com.example.sistemadereclutamiento.refreshToken.entity.RefreshToken;
 import com.example.sistemadereclutamiento.refreshToken.repository.RefreshTokenRepository;
 import com.example.sistemadereclutamiento.refreshToken.service.RefreshTokenService;
@@ -10,6 +13,8 @@ import com.example.sistemadereclutamiento.security.jtw.JwtProperties;
 import com.example.sistemadereclutamiento.security.jtw.JwtService;
 import com.example.sistemadereclutamiento.security.service.CustomUserDetail;
 import com.example.sistemadereclutamiento.shared.exeption.BusinessException;
+import com.example.sistemadereclutamiento.shared.exeption.CompanyNotVerifiedException;
+import com.example.sistemadereclutamiento.shared.exeption.ResourceNotFoundException;
 import com.example.sistemadereclutamiento.usuario.entity.Usuario;
 import com.example.sistemadereclutamiento.usuario.repository.UsuarioRepositorio;
 import io.jsonwebtoken.Claims;
@@ -38,6 +43,7 @@ public class AuthService {
     private final UsuarioRepositorio usuarioRepositorio;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserDetailsService userDetailsService;
+    private final EmpresaRepository empresaRepository;
 
 
     public TokenResponse login(LoginRequest request) {
@@ -50,6 +56,23 @@ public class AuthService {
 
         CustomUserDetail custom = (CustomUserDetail) authentication.getPrincipal();
         Usuario usuario = custom.getUsuario();
+
+        // Si el usuario es una EMPRESA, su cuenta no puede usarse hasta que un
+        // administrador la verifique (estadoValidacion pasa de PENDIENTE a ACTIVO).
+        // Se valida antes de emitir cualquier token/refresh token.
+        boolean esEmpresa = usuario.getRoles().stream()
+                .anyMatch(rol -> "EMPRESA".equalsIgnoreCase(rol.getNombre()));
+
+        if (esEmpresa) {
+            Empresa empresa = empresaRepository.findEmpresasByUsuario_Id(usuario.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+
+            if (empresa.getEstadoValidacion() == EstadoValidacion.PENDIENTE) {
+                throw new CompanyNotVerifiedException(
+                        "La cuenta de tu empresa está pendiente de verificación por un administrador."
+                );
+            }
+        }
 
         String token = jwtService.generateToken(custom);
 

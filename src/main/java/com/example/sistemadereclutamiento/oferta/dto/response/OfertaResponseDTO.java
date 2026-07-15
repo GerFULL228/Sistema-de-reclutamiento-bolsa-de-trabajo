@@ -15,6 +15,7 @@ public class OfertaResponseDTO {
     private String descripcion;
     private String ubicacion;
     private Double salario;
+    private String modalidad;
     private String estado;
     private String nombreEmpresa;
 

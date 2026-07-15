@@ -8,9 +8,7 @@ import com.example.sistemadereclutamiento.postulacion.service.PostulacionService
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-// IMPORT DE SEGURIDAD
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,7 +35,9 @@ public class PostulacionController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // @PreAuthorize("hasAuthority('OFERTA_UPDATE') or hasAuthority('POSTULAR')") // COMENTADO TEMPORALMENTE
+    // Cambio de estado de una postulación: exclusivo de la empresa dueña de la oferta (o admin).
+    // La verificación de propiedad real ocurre en el service.
+    @PreAuthorize("hasRole('EMPRESA') or hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<PostulacionResponseDTO> actualizarPostulacion(
             @PathVariable Long id, 
@@ -55,8 +55,23 @@ public class PostulacionController {
         return ResponseEntity.ok(response);
     }
 
+    // Fase 3: listado de "Mis Postulaciones" para el postulante autenticado (sin exponer IDs ajenos)
+    @GetMapping("/mis-postulaciones")
+    public ResponseEntity<List<PostulacionResponseDTO>> misPostulaciones() {
+        List<PostulacionResponseDTO> response = postulacionService.misPostulaciones();
+        return ResponseEntity.ok(response);
+    }
+
+    // Fase 3: el postulante autenticado anula/cancela su propia postulación
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<PostulacionResponseDTO> cancelarPostulacion(@PathVariable Long id) {
+        PostulacionResponseDTO response = postulacionService.cancelarPostulacion(id);
+        return ResponseEntity.ok(response);
+    }
+
     // Obtener todas las postulaciones recibidas en una Oferta Laboral específica
-    // @PreAuthorize("hasAuthority('OFERTA_VIEW') or hasAuthority('OFERTA_UPDATE')") // COMENTADO TEMPORALMENTE
+    // (ver postulantes): exclusivo de la empresa dueña de la oferta (o admin).
+    @PreAuthorize("hasRole('EMPRESA') or hasRole('ADMIN')")
     @GetMapping("/oferta/{ofertaId}")
     public ResponseEntity<List<PostulacionResponseDTO>> obtenerPorOferta(@PathVariable Long ofertaId) {
         List<PostulacionResponseDTO> response = postulacionService.obtenerPorOferta(ofertaId);

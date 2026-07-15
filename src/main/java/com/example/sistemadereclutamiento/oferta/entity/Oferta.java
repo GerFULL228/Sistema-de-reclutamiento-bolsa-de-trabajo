@@ -27,6 +27,10 @@ public class Oferta {
     @Column(nullable = false)
     private Double salario;
 
+    @Column(length = 20, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Modalidad modalidad = Modalidad.PRESENCIAL;
+
     @Column(length = 30, nullable = false)
     @Enumerated(EnumType.STRING)
     private OfertaEstado estado = OfertaEstado.ACTIVA;
