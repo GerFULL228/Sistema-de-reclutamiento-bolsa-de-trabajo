@@ -92,6 +92,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Necesario para @WithMockUser en los tests de controladores que usan
+             @PreAuthorize (p.ej. OfertaAdminController). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
